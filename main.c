@@ -37,11 +37,11 @@ int main(){
 }
 
 void MainMenu(){
-    printf(" \t \t \t \t \t \t \t \tStart Game     ---> enter (1) \n");
-    printf(" \t \t \t \t \t \t \t \tLoad Game      ---> enter (2) \n");
-    printf(" \t \t \t \t \t \t \t \ttop 10 Players ---> enter (3) \n");
-    printf(" \t \t \t \t \t \t \t \tExit           ---> enter (4) \n");
-    printf(" \t \t \t \t \t \t \t \tChoose An Option = \n");
+    printf(" \t \t \t \t \t Start Game     ---> enter (1) \n");
+    printf(" \t \t \t \t \t Load Game      ---> enter (2) \n");
+    printf(" \t \t \t \t \t top 10 Players ---> enter (3) \n");
+    printf(" \t \t \t \t \t Exit           ---> enter (4) \n");
+    printf(" \t \t \t \t \t Choose An Option = ");
     int x = InputHandling(s , 1 , 4);
     switch (x) {
         case 1 : GameDifficulty();break;
@@ -53,10 +53,11 @@ void MainMenu(){
 }
 
 void GameDifficulty(){
-    printf(" \t \t \t \t \t \t \t \tChoose Difficulty : \n");
-    printf(" \t \t \t \t \t \t \t \tBeginner (2 x 2) ---> enter (1) \n");
-    printf(" \t \t \t \t \t \t \t \tExpert   (5 x 5  ---> enter (2) \n");
-    printf(" \t \t \t \t \t \t \t \tChoose An Option = \n");
+    system("cls");
+    printf(" \t \t \t \t \t Choose Difficulty : \n");
+    printf(" \t \t \t \t \t Beginner (2 x 2) ---> enter (1) \n");
+    printf(" \t \t \t \t \t Expert   (5 x 5  ---> enter (2) \n");
+    printf(" \t \t \t \t \t Choose An Option = ");
     int x = InputHandling(s , 1 , 2);
     switch (x) {
         case 1 : GameMode(x);break;
@@ -91,9 +92,11 @@ void Exit() {
 }
 
 void GameMode(int z){
-    printf(" \t \t \t \t \t \t \t \tChoose GameMode : \n");
-    printf(" \t \t \t \t \t \t \t \tPlayer vs Player   ---> enter (1) \n");
-    printf(" \t \t \t \t \t \t \t \tPlayer vs Computer ---> enter (2) \n");
+    system("cls");
+    printf(" \t \t \t \t \t Choose GameMode : \n");
+    printf(" \t \t \t \t \t Player vs Player   ---> enter (1) \n");
+    printf(" \t \t \t \t \t Player vs Computer ---> enter (2) \n");
+    printf(" \t \t \t \t \t Choose An Option = ");
     int x = InputHandling(s , 1 , 2);
     switch (x) {
         case 1: GameLoop(z , x);break;
@@ -148,7 +151,9 @@ void SizeChecker(char x[]) {
     while (c != 1) {
         gets(x);
         c = StringSize(x);
-        if (c != 1) printf("Error,Enter A Valid Number = \n");
+        if (c != 1) {
+            printf("Error,Enter A Valid Number = \n");
+        }
     }
 }
 
@@ -160,15 +165,15 @@ void CharacterChecker(char x[]){
 }
 
 void PrintGrid(int x , int y , char arr[x][y]){
-    printf(" \t \t \t \t \t \t \t \t \t  ");
+    printf(" \t \t \t \t \t   ");
     for (int i = 0; i < y / 2 + 1; ++i) {
         printf("%d ",i + 1);
     }
     printf("\n");
     for (int i = 0; i < x; ++i) {
-        printf(" \t \t \t \t \t \t \t \t \t%d " , i + 1);
+        printf(" \t \t \t \t \t %d " , i + 1);
         for (int j = 0; j < y; ++j) {
-                printf("%c", arr[i][j]);
+            printf("%c", arr[i][j]);
         }
         printf("\n");
     }
