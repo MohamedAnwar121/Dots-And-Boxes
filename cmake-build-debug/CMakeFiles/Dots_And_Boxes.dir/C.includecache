@@ -1,0 +1,20 @@
+#IncludeRegexLine: ^[ 	]*[#%][ 	]*(include|import)[ 	]*[<"]([^">]+)([">])
+
+#IncludeRegexScan: ^.*$
+
+#IncludeRegexComplain: ^$
+
+#IncludeRegexTransform: 
+
+A:/CSED/3rd Semester/Programming/Dots And Boxes/main.c
+stdio.h
+-
+stdlib.h
+-
+windows.h
+-
+conio.h
+-
+math.h
+-
+
