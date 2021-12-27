@@ -4,6 +4,14 @@
 #include <conio.h>
 #include <math.h>
 
+//vertical 186 horizontal 205
+
+typedef struct{
+    char c;
+    int color;
+
+}Element;
+
 #define RED     "\x1b[31m"
 #define GREEN   "\x1b[32m"
 #define YELLOW  "\x1b[33m"
@@ -29,9 +37,10 @@ int StringSize(char x[]);
 void SizeChecker(char x[]);
 void CharacterChecker(char x[]);
 int InputHandling(char x[] , int z, int y);
-void PrintGrid(int x, int y, char arr[x][y]);
+void PrintGrid(int x, int y, Element arr[x][y]);
 
 int main(){
+    system("");
     BeginnerUI();
     return 0;
 }
@@ -68,7 +77,7 @@ void GameDifficulty(){
 }
 
 void GameLoop(int x , int y){
-    ///
+
 }
 
 void ComputerTurn() {
@@ -110,18 +119,19 @@ void ExpertUI(){
 }
 
 void BeginnerUI (){
-    int n = 2 , m = 2 ,k ,v;
+    int n = 2 , k ,v;
     k = 2*n + 1;
-    v = 4*m + 1;
-    char arr[k][v];
+    v = 2*n + 1;
+    Element arr[k][v];
     for (int i = 0; i < k; ++i) {
         for (int j = 0; j < v; ++j) {
-            arr[i][j] = ' ';
+            arr[i][j].color = 0;
+            arr[i][j].c = ' ';
         }
     }
     for (int i = 0; i < k; i += 2) {
-        for (int j = 0; j < v; j += 4) {
-            arr[i][j] = 254;
+        for (int j = 0; j < v; j += 2) {
+            arr[i][j].c = 254;
         }
     }
     PrintGrid(k , v , arr);
@@ -164,16 +174,16 @@ void CharacterChecker(char x[]){
     }
 }
 
-void PrintGrid(int x , int y , char arr[x][y]){
+void PrintGrid(int x , int y ,Element arr[x][y]){
     printf(" \t \t \t \t \t   ");
-    for (int i = 0; i < y / 2 + 1; ++i) {
-        printf("%d ",i + 1);
+    for (int i = 0; i < y ; ++i) {
+        printf("%d",i + 1);
     }
     printf("\n");
     for (int i = 0; i < x; ++i) {
         printf(" \t \t \t \t \t %d " , i + 1);
         for (int j = 0; j < y; ++j) {
-            printf("%c", arr[i][j]);
+            printf("%c", arr[i][j].c);
         }
         printf("\n");
     }
