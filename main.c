@@ -2,6 +2,8 @@
 #include <stdlib.h>
 
 //vertical 186 horizontal 205 Box 219
+int new_player_score;
+char new_player_name[30];
 
 typedef struct {
     char c;
@@ -55,7 +57,7 @@ void PrintGrid(int x, int y, Element arr[x][y]);
 
 int main() {
     system("");
-    MainMenu();
+    Scores(88,"bolbol");
     return 0;
 }
 
@@ -211,7 +213,7 @@ void PlayerVSPlayer(int x) {
     }
 }
 
-void ComputerVSPlayer() {
+void ComputerVSPlayer(int x) {
     int k , v , n;
     n = 2;
     k = 2 * n + 1;
@@ -240,8 +242,65 @@ void LoadGame() {
     ///
 }
 
-void Scores() {
-    ///
+void Scores(int newScore,char newName[30]) {
+    int swap,flag=0;
+    char sswap[30];
+    Player z[11];
+     for(int i=0;i<11;i++){
+        z[i].Score=0;
+        z[i].Name[0]='\0';
+     }
+   FILE *f = fopen("scores.txt","r");
+   for(int i=0;i<11;i++){
+        fscanf(f,"%[^\n]",z[i].Name);
+        fscanf(f,"%d\n",&z[i].Score);
+
+     }
+     fclose(f);
+     for(int j=0;j<10;j++){
+        if(!strcmp(z[j].Name,newName)){
+            if(newScore>=z[j].Score){
+                z[j].Score=newScore;
+                flag=1;
+                break;
+            }
+        }
+     }
+     if(flag==0){
+     strcpy(z[10].Name,newName);
+     z[10].Score=newScore;
+     }
+     for (int c = 0 ; c < 11 - 1; c++)
+  {
+    for (int d = 0 ; d < 11 - c - 1; d++)
+    {
+      if (z[d].Score < z[d+1].Score)
+      {
+        swap       = z[d].Score;
+        strcpy(sswap,z[d].Name);
+        z[d].Score   = z[d+1].Score;
+        strcpy(z[d].Name,z[d+1].Name);
+        z[d+1].Score = swap;
+        strcpy(z[d+1].Name,sswap);
+      }
+    }
+  }
+
+     for(int i=0;i<10;i++){
+        if(z[i].Score!=0){
+            printf("%d)%s  %d\n",i+1,z[i].Name,z[i].Score);
+           // fprintf(b,"%s\n%d\n",z[i].Name,z[i].Score);
+        }
+     }
+     FILE *b =fopen("scores.txt","w");
+     for(int i=0;i<10;i++){
+        if(z[i].Score!=0){
+
+            fprintf(b,"%s\n%d\n",z[i].Name,z[i].Score);
+        }
+     }
+     fclose(b);
+
 }
 
 void UI(){
