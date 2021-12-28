@@ -11,8 +11,7 @@ typedef struct {
 typedef struct {
     char Name[30];
     int Score;
-    int Wins;
-}Player;
+} Player;
 
 #define RED     "\x1b[31m"
 #define GREEN   "\x1b[32m"
@@ -23,19 +22,35 @@ typedef struct {
 #define RESET   "\x1b[0m"
 
 char s[100];
+
 void MainMenu();
+
 void GameDifficulty();
+
 void GameMode(int z);
-void GameLoop(int x, int y);
-void ComputerTurn();
+
+void UI();
+
+void PlayerVSPlayer(int x);
+
+void ComputerVSPlayer(int x);
+
 void SaveGame();
+
 void LoadGame();
+
 void Scores();
+
 void Time();
+
 int StringSize(char x[]);
+
 void SizeChecker(char x[]);
+
 void CharacterChecker(char x[]);
+
 int InputHandling(char x[], int z, int y);
+
 void PrintGrid(int x, int y, Element arr[x][y]);
 
 int main() {
@@ -92,12 +107,12 @@ void GameDifficulty() {
     }
 }
 
-void GameLoop(int x, int y) {
-    int n = 2, k, v, r, c, p = 1, z = 1 , b = 0;
+void PlayerVSPlayer(int x) {
+    int n = 2, k, v, r, c, p = 1, z = 1, b = 0;
     k = 2 * n + 1;
-    v = 2 * n + 1;
+    v = 4 * n + 1;
     Element arr[k][v];
-    Player P1 , P2;
+    Player P1, P2;
     P1.Score = 0;
     P2.Score = 0;
     for (int i = 0; i < k; ++i) {
@@ -107,7 +122,7 @@ void GameLoop(int x, int y) {
         }
     }
     for (int i = 0; i < k; i += 2) {
-        for (int j = 0; j < v; j += 2) {
+        for (int j = 0; j < v; j += 4) {
             arr[i][j].c = 254;
         }
     }
@@ -122,20 +137,20 @@ void GameLoop(int x, int y) {
         scanf("%d", &r);
         printf("\nEnter Col =");
         scanf("%d", &c);
-        while (r > k && c > v) {
+        while (r > k && 2*c - 1 > v) {
             printf("Error , Out of Bound \n");
             printf("Enter Raw =");
             scanf("%d", &r);
             printf("\nEnter Col =");
             scanf("%d", &c);
         }
-        while(arr[r - 1][c - 1].c != ' ' ){
+        while (arr[r - 1][2*c - 2].c != ' ') {
             printf("No Available Moves\n");
             printf("Enter Raw =");
             scanf("%d", &r);
             printf("\nEnter Col =");
             scanf("%d", &c);
-            while (r > k && c > v) {
+            while (r > k && 2 * c - 1 > v) {
                 printf("Error , Out of Bound \n");
                 printf("Enter Raw =");
                 scanf("%d", &r);
@@ -144,31 +159,43 @@ void GameLoop(int x, int y) {
             }
         }
         if (r % 2 == 0 && c % 2 == 1) {
-            arr[r - 1][c - 1].c = 186;
-            arr[r - 1][c - 1].color = p;
+            arr[r - 1][2 * c - 2].c = 186;
+            arr[r - 1][2 * c - 2].color = p;
         } else if (r % 2 == 1 && c % 2 == 0) {
-            arr[r - 1][c - 1].c = 205;
-            arr[r - 1][c - 1].color = p;
+            arr[r - 1][2 * c - 2].color = p;
+            arr[r - 1][2 * c - 2].c = 205;
+            arr[r - 1][2 * c - 1].color = p;
+            arr[r - 1][2 * c - 1].c = 205;
+            arr[r - 1][2 * c - 3].color = p;
+            arr[r - 1][2 * c - 3].c = 205;
         } else {
             printf("No Available Moves\n");
             continue;
         }
         for (int i = 1; i < k; i += 2) {
-            for (int j = 1; j < v; j += 2) {
-                if(arr[i][j].c == ' '){
-                    if(arr[i - 1][j].c != ' ' && arr[i + 1][j].c != ' ' && arr[i][j + 1].c != ' ' && arr[i][j - 1].c != ' '){
-                        if(p == 1){
+            for (int j = 2; j < v; j += 4) {
+                if (arr[i][j].c == ' ') {
+                    if (arr[i][j - 2].c != ' ' && arr[i][j + 2].c != ' ' && arr[i - 1][j].c != ' ' && arr[i + 1][j].c != ' ') {
+                        if (p == 1) {
                             b++;
                             z = 2;
                             P1.Score++;
                             arr[i][j].c = 219;
                             arr[i][j].color = 1;
-                        }else {
+                            arr[i][j - 1].c = 219;
+                            arr[i][j - 1].color = 1;
+                            arr[i][j + 1].c = 219;
+                            arr[i][j + 1].color = 1;
+                        } else {
                             b++;
                             z = 1;
                             P2.Score++;
                             arr[i][j].c = 219;
                             arr[i][j].color = 2;
+                            arr[i][j - 1].c = 219;
+                            arr[i][j - 1].color = 2;
+                            arr[i][j + 1].c = 219;
+                            arr[i][j + 1].color = 2;
                         }
                     }
                 }
@@ -177,15 +204,32 @@ void GameLoop(int x, int y) {
         z++;
         system("cls");
         PrintGrid(k, v, arr);
-        if(b == n * n){
+        if (b == n * n) {
             printf("Game Ended");
             break;
         }
     }
 }
 
-void ComputerTurn() {
-    ///
+void ComputerVSPlayer() {
+    int k , v , n;
+    n = 2;
+    k = 2 * n + 1;
+    v = 4 * n + 1;
+    Element arr[k][v];
+    Player P , C;
+    for (int i = 0; i < k; ++i) {
+        for (int j = 0; j < v; ++j) {
+            arr[i][j].color = 0;
+            arr[i][j].c = ' ';
+        }
+    }
+    for (int i = 0; i < k; i += 2) {
+        for (int j = 0; j < v; j += 4) {
+            arr[i][j].c = 254;
+        }
+    }
+
 }
 
 void SaveGame() {
@@ -198,6 +242,10 @@ void LoadGame() {
 
 void Scores() {
     ///
+}
+
+void UI(){
+    //
 }
 
 void Time() {
@@ -213,10 +261,10 @@ void GameMode(int z) {
     int x = InputHandling(s, 1, 2);
     switch (x) {
         case 1:
-            GameLoop(z, x);
+            PlayerVSPlayer(z);
             break;
         case 2:
-            GameLoop(z, x);
+            ComputerVSPlayer(z);
             break;
         default:
             break;
@@ -262,8 +310,8 @@ void CharacterChecker(char x[]) {
 
 void PrintGrid(int x, int y, Element arr[x][y]) {
     printf(" \t \t \t \t \t   ");
-    for (int i = 0; i < y; ++i) {
-        printf("%d", i + 1);
+    for (int i = 0; i < y / 2 + 1; i++) {
+        printf("%d ", i + 1);
     }
     printf("\n");
     for (int i = 0; i < x; ++i) {
@@ -274,7 +322,7 @@ void PrintGrid(int x, int y, Element arr[x][y]) {
             } else if (arr[i][j].color == 2) {
                 printf(BLUE"%c"RESET, arr[i][j].c);
             } else {
-                printf("%c" , arr[i][j].c);
+                printf("%c", arr[i][j].c);
             }
         }
         printf("\n");
