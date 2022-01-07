@@ -1,3 +1,0 @@
-"C:\Program Files\JetBrains\CLion 2021.2.3\bin\cmake\win\bin\cmake.exe" -E rm -f CMakeFiles\Dots_And_Boxes.dir/objects.a
-C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\ar.exe cr CMakeFiles\Dots_And_Boxes.dir/objects.a @CMakeFiles\Dots_And_Boxes.dir\objects1.rsp
-C:\PROGRA~1\MINGW-~1\X86_64~1.0-P\mingw64\bin\gcc.exe -g -Wl,--whole-archive CMakeFiles\Dots_And_Boxes.dir/objects.a -Wl,--no-whole-archive -o Dots_And_Boxes.exe -Wl,--out-implib,libDots_And_Boxes.dll.a -Wl,--major-image-version,0,--minor-image-version,0 @CMakeFiles\Dots_And_Boxes.dir\linklibs.rsp

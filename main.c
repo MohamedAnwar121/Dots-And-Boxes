@@ -163,6 +163,11 @@ void PlayerVSPlayer(int x) {
                 continue;
             }
         }else if(r == 3 && c == 3){
+            SaveGame(n,moves,y);
+            system("cls");
+            printf("game saved");
+            PrintGrid(k , v , arr);
+            continue;
 
         }
         if (r > k || 2*c - 1 > v) {
@@ -580,14 +585,118 @@ void ComputerVSPlayer(int x) {
         }
     }
 }
-void SaveGame() {
-    ///
+void SaveGame(int n,int moves[2*n*(n+1)][3],int y) {
+    FILE *s1=fopen("gameone.txt","w");
+    fprintf(s1,"%d\n",n);
+    fprintf(s1,"%d\n",y);
+    for(int i=0;i<y;i++){
+        for(int j=0;j<3;j++){
+            fprintf(s1,"%d ",moves[i][j]);
+        }
+        fprintf(s1,"\n");
+    }
+    fclose(s1);
 }
-
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
 void LoadGame() {
-    ///
-}
+    int b=0,P1=0,P2=0,r,c,p;
 
+
+    FILE *L1=fopen("gameone.txt","r");
+    int y,n;
+    fscanf(L1,"%d\n",&n);
+
+    fscanf(L1,"%d\n",&y);
+
+    int k = 2 * n + 1;
+    int v = 4 * n + 1;
+    Element arr1[k][v];
+    int moves[2*n*(n+1)][3];
+    for(int i=0;i<y;i++){
+        for(int j=0;j<3;j++){
+            fscanf(L1,"%d%*c",&moves[i][j]);
+        }
+        fscanf(L1,"%*c");
+
+    }
+    printf("%d\n",n);
+    printf("%d\n",y);
+    for(int i=0;i<y;i++){
+        for(int j=0;j<3;j++){
+            printf("%d ",moves[i][j]);
+        }
+        printf("\n");
+    }
+    fclose(L1);
+
+
+    for (int i = 0; i < k; ++i) {
+        for (int j = 0; j < v; ++j) {
+            arr1[i][j].color = 0;
+            arr1[i][j].c = ' ';
+        }
+    }
+    for (int i = 0; i < k; i += 2) {
+        for (int j = 0; j < v; j += 4) {
+            arr1[i][j].c = 254;
+        }
+    }
+
+
+    for (int i = 0; i < 2*n*(n+1); ++i) {
+        for (int j = 0; j < 3; ++j) {
+            moves[i][j] = 0;
+        }
+    }
+
+
+    for(int u=0;u<y;u++) {
+        r = moves[u][0];
+        c = moves[u][1];
+        p = moves[u][2];
+        if (r % 2 == 0 && c % 2 == 1) {
+            arr1[r - 1][2 * c - 2].c = 186;
+            arr1[r - 1][2 * c - 2].color = p;
+        } else if (r % 2 == 1 && c % 2 == 0) {
+            arr1[r - 1][2 * c - 2].color = p;
+            arr1[r - 1][2 * c - 2].c = 205;
+            arr1[r - 1][2 * c - 1].color = p;
+            arr1[r - 1][2 * c - 1].c = 205;
+            arr1[r - 1][2 * c - 3].color = p;
+            arr1[r - 1][2 * c - 3].c = 205;
+        }
+        for (int i = 1; i < k; i += 2) {
+            for (int j = 2; j < v; j += 4) {
+                if (arr1[i][j].c == ' ') {
+                    if (arr1[i][j - 2].c != ' ' && arr1[i][j + 2].c != ' ' && arr1[i - 1][j].c != ' ' && arr1[i + 1][j].c != ' ') {
+                        if (p == 1) {
+                            b++;
+                            P1++;
+                            arr1[i][j].c = 219;
+                            arr1[i][j].color = 1;
+                            arr1[i][j - 1].c = 219;
+                            arr1[i][j - 1].color = 1;
+                            arr1[i][j + 1].c = 219;
+                            arr1[i][j + 1].color = 1;
+                        } else {
+                            b++;
+                            P2++;
+                            arr1[i][j].c = 219;
+                            arr1[i][j].color = 2;
+                            arr1[i][j - 1].c = 219;
+                            arr1[i][j - 1].color = 2;
+                            arr1[i][j + 1].c = 219;
+                            arr1[i][j + 1].color = 2;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    PrintGrid(k,v,arr1);
+
+}
+///////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 int Undo(int* P1,int* P2,int* b,int x,int moves[2*x*(x+1)][3],int q,int k,int v,Element arr[k][v]){
     int r , c , p , z;
     *b = 0;

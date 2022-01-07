@@ -1,3 +1,0 @@
-A:/CSED/3rd Semester/Programming/Dots And Boxes/cmake-build-debug/CMakeFiles/Dots_And_Boxes.dir
-A:/CSED/3rd Semester/Programming/Dots And Boxes/cmake-build-debug/CMakeFiles/edit_cache.dir
-A:/CSED/3rd Semester/Programming/Dots And Boxes/cmake-build-debug/CMakeFiles/rebuild_cache.dir
