@@ -1,9 +1,9 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <time.h>
+#include <string.h>
 
 //vertical 186 horizontal 205 Box 219
-int new_player_score;
-char new_player_name[30];
 
 typedef struct {
     char c;
@@ -24,40 +24,27 @@ typedef struct {
 #define RESET   "\x1b[0m"
 
 char s[100];
-
 void MainMenu();
-
 void GameDifficulty();
-
 void GameMode(int z);
-
 void UI();
-
 void PlayerVSPlayer(int x);
-
 void ComputerVSPlayer(int x);
-
+int Redo(int* P1,int* P2,int* b,int x,int moves[2*x*(x+1)][3],int q,int k,int v,Element arr[k][v]);
+int Undo(int* P1,int* P2,int* b,int x,int moves[2*x*(x+1)][3],int q,int k,int v,Element arr[k][v]);
 void SaveGame();
-
 void LoadGame();
-
-void Scores();
-
+void Scores(int newScore,char newName[30]);
 void Time();
-
 int StringSize(char x[]);
-
 void SizeChecker(char x[]);
-
 void CharacterChecker(char x[]);
-
 int InputHandling(char x[], int z, int y);
-
 void PrintGrid(int x, int y, Element arr[x][y]);
 
 int main() {
     system("");
-    Scores(88,"bolbol");
+    MainMenu();
     return 0;
 }
 
@@ -79,7 +66,7 @@ void MainMenu() {
             break;
         case 3 :
             system("cls");
-            Scores();
+            /*Scores();*/
             break;
         case 4 :
             exit(0);
@@ -110,13 +97,22 @@ void GameDifficulty() {
 }
 
 void PlayerVSPlayer(int x) {
-    int n = 2, k, v, r, c, p = 1, z = 1, b = 0;
+    int n = 2, k, v, r, c, p = 1, z = 1, b = 0 , q = 0 , y = 0 , back = 0;
     k = 2 * n + 1;
     v = 4 * n + 1;
     Element arr[k][v];
+    int moves[2*n*(n+1)][3];
+    for (int i = 0; i < 2*n*(n+1); ++i) {
+        for (int j = 0; j < 3; ++j) {
+            moves[i][j] = 0;
+        }
+    }
     Player P1, P2;
     P1.Score = 0;
     P2.Score = 0;
+
+    //Grid intialization
+
     for (int i = 0; i < k; ++i) {
         for (int j = 0; j < v; ++j) {
             arr[i][j].color = 0;
@@ -129,6 +125,9 @@ void PlayerVSPlayer(int x) {
         }
     }
     PrintGrid(k, v, arr);
+
+    //Gameloop
+
     while (1) {
         if (z % 2 == 1) {
             p = 1;
@@ -139,30 +138,56 @@ void PlayerVSPlayer(int x) {
         scanf("%d", &r);
         printf("\nEnter Col =");
         scanf("%d", &c);
-        while (r > k && 2*c - 1 > v) {
-            printf("Error , Out of Bound \n");
-            printf("Enter Raw =");
-            scanf("%d", &r);
-            printf("\nEnter Col =");
-            scanf("%d", &c);
-        }
-        while (arr[r - 1][2*c - 2].c != ' ') {
-            printf("No Available Moves\n");
-            printf("Enter Raw =");
-            scanf("%d", &r);
-            printf("\nEnter Col =");
-            scanf("%d", &c);
-            while (r > k && 2 * c - 1 > v) {
-                printf("Error , Out of Bound \n");
-                printf("Enter Raw =");
-                scanf("%d", &r);
-                printf("\nEnter Col =");
-                scanf("%d", &c);
+        if(r == 1 && c == 1){
+            if(q == 0){
+                system("cls");
+                printf("No Available Moves \n");
+                PrintGrid(k , v , arr);
+                continue;
+            }else{
+                z = Undo(&P1.Score,&P2.Score,&b,n,moves,q,k,v,arr);
+                back++;
+                q--;
+                continue;
             }
+        }else if(r == 2 && c == 2){
+            if(q < y){
+                z = Redo(&P1.Score,&P2.Score,&b,n,moves,q,k,v,arr);
+                q++;
+                back--;
+                continue;
+            }else{
+                system("cls");
+                printf("No Available Moves \n");
+                PrintGrid(k , v , arr);
+                continue;
+            }
+        }else if(r == 3 && c == 3){
+
+        }
+        if (r > k || 2*c - 1 > v) {
+            printf("No Available Moves \n");
+            continue;
+        }
+        if (arr[r - 1][2*c - 2].c != ' ') {
+            printf("No Available Moves\n");
+            continue;
         }
         if (r % 2 == 0 && c % 2 == 1) {
             arr[r - 1][2 * c - 2].c = 186;
             arr[r - 1][2 * c - 2].color = p;
+            moves[q][0] = r;
+            moves[q][1] = c;
+            moves[q][2] = p;
+            y -= back;
+            y++;
+            q = y;
+            back = 0;
+            for (int i = y; i < 2*n*(n+1); ++i) {
+                for (int j = 0; j < 3; ++j) {
+                    moves[i][j] = 0;
+                }
+            }
         } else if (r % 2 == 1 && c % 2 == 0) {
             arr[r - 1][2 * c - 2].color = p;
             arr[r - 1][2 * c - 2].c = 205;
@@ -170,6 +195,18 @@ void PlayerVSPlayer(int x) {
             arr[r - 1][2 * c - 1].c = 205;
             arr[r - 1][2 * c - 3].color = p;
             arr[r - 1][2 * c - 3].c = 205;
+            moves[q][0] = r;
+            moves[q][1] = c;
+            moves[q][2] = p;
+            y -= back;
+            y++;
+            q = y;
+            back = 0;
+            for (int i = y; i < 2*n*(n+1); ++i) {
+                for (int j = 0; j < 3; ++j) {
+                    moves[i][j] = 0;
+                }
+            }
         } else {
             printf("No Available Moves\n");
             continue;
@@ -214,12 +251,13 @@ void PlayerVSPlayer(int x) {
 }
 
 void ComputerVSPlayer(int x) {
-    int k , v , n;
-    n = 2;
+    int n = 2, k, v, r, c, p = 1, z = 1, b = 0, h, f , q = 0;
     k = 2 * n + 1;
     v = 4 * n + 1;
     Element arr[k][v];
-    Player P , C;
+    Player P, C;
+    P.Score = 0;
+    C.Score = 0;
     for (int i = 0; i < k; ++i) {
         for (int j = 0; j < v; ++j) {
             arr[i][j].color = 0;
@@ -231,9 +269,317 @@ void ComputerVSPlayer(int x) {
             arr[i][j].c = 254;
         }
     }
+    PrintGrid(k, v, arr);
+    while (1) {
+        if (z % 2 == 1) {
+            p = 1;
+        } else {
+            p = 2;
+        }
+        if (p == 1) {
+            printf("Enter Raw =");
+            scanf("%d", &r);
+            printf("\nEnter Col =");
+            scanf("%d", &c);
+            while (r > k || 2 * c - 1 > v) {
+                printf("No Available Moves \n");
+                printf("Enter Raw =");
+                scanf("%d", &r);
+                printf("\nEnter Col =");
+                scanf("%d", &c);
+            }
+            while (arr[r - 1][2 * c - 2].c != ' ') {
+                printf("No Available Moves\n");
+                printf("Enter Raw =");
+                scanf("%d", &r);
+                printf("\nEnter Col =");
+                scanf("%d", &c);
+                while (r > k && 2 * c - 1 > v) {
+                    printf("No Available Moves\n");
+                    printf("Enter Raw =");
+                    scanf("%d", &r);
+                    printf("\nEnter Col =");
+                    scanf("%d", &c);
+                }
+            }
+            if (r % 2 == 0 && c % 2 == 1) {
+                arr[r - 1][2 * c - 2].c = 186;
+                arr[r - 1][2 * c - 2].color = 1;
+            } else if (r % 2 == 1 && c % 2 == 0) {
+                arr[r - 1][2 * c - 2].color = 1;
+                arr[r - 1][2 * c - 2].c = 205;
+                arr[r - 1][2 * c - 1].color = 1;
+                arr[r - 1][2 * c - 1].c = 205;
+                arr[r - 1][2 * c - 3].color = 1;
+                arr[r - 1][2 * c - 3].c = 205;
+            } else {
+                printf("No Available Moves\n");
+                system("cls");
+                continue;
+            }
+            for (int i = 1; i < k; i += 2) {
+                for (int j = 2; j < v; j += 4) {
+                    if (arr[i][j].c == ' ') {
+                        if (arr[i][j - 2].c != ' ' && arr[i][j + 2].c != ' ' && arr[i - 1][j].c != ' ' &&
+                            arr[i + 1][j].c != ' ') {
+                            b++;
+                            z = 2;
+                            P.Score++;
+                            arr[i][j].c = 219;
+                            arr[i][j].color = 1;
+                            arr[i][j - 1].c = 219;
+                            arr[i][j - 1].color = 1;
+                            arr[i][j + 1].c = 219;
+                            arr[i][j + 1].color = 1;
+                        }
+                    }
+                }
+            }
+            z++;
+            system("cls");
+            PrintGrid(k, v, arr);
+            if (b == n * n) {
+                printf("Game Ended");
+                break;
+            }
+        } else {
+            int rc = c ,cc = r;
+            for (int i = 1; i < k; i += 2) {
+                for (int j = 2; j < v; j += 4) {
+                    h = 0;
+                    f = 0;
+                    if (arr[i][j].c == ' ') {
+                        if (arr[i + 1][j].c != ' ') {
+                            h++;
+                        }
+                        if (arr[i - 1][j].c != ' ') {
+                            h++;
+                        }
+                        if (arr[i][j - 2].c != ' ') {
+                            h++;
+                        }
+                        if (arr[i][j + 2].c != ' ') {
+                            h++;
+                        }
+                    }
+                    if (h == 3) {
+                        if (arr[i + 1][j].c == ' ') {
+                            arr[i + 1][j].c = 205;
+                            arr[i + 1][j].color = 2;
+                            arr[i + 1][j - 1].c = 205;
+                            arr[i + 1][j - 1].color = 2;
+                            arr[i + 1][j + 1].c = 205;
+                            arr[i + 1][j + 1].color = 2;
+                            arr[i][j].c = 219;
+                            arr[i][j].color = 2;
+                            arr[i][j - 1].c = 219;
+                            arr[i][j - 1].color = 2;
+                            arr[i][j + 1].c = 219;
+                            arr[i][j + 1].color = 2;
+                            b++;
+                            z = 1;
+                            f = 1;
+                            C.Score++;
+                            break;
+                        } else if (arr[i - 1][j].c == ' ') {
+                            arr[i - 1][j].c = 205;
+                            arr[i - 1][j].color = 2;
+                            arr[i - 1][j - 1].c = 205;
+                            arr[i - 1][j - 1].color = 2;
+                            arr[i - 1][j + 1].c = 205;
+                            arr[i - 1][j + 1].color = 2;
+                            arr[i][j].c = 219;
+                            arr[i][j].color = 2;
+                            arr[i][j - 1].c = 219;
+                            arr[i][j - 1].color = 2;
+                            arr[i][j + 1].c = 219;
+                            arr[i][j + 1].color = 2;
+                            b++;
+                            z = 1;
+                            f = 1;
+                            C.Score++;
+                            break;
+                        } else if (arr[i][j - 2].c == ' ') {
+                            arr[i][j - 2].c = 186;
+                            arr[i][j - 2].color = 2;
+                            arr[i][j].c = 219;
+                            arr[i][j].color = 2;
+                            arr[i][j - 1].c = 219;
+                            arr[i][j - 1].color = 2;
+                            arr[i][j + 1].c = 219;
+                            arr[i][j + 1].color = 2;
+                            b++;
+                            z = 1;
+                            f = 1;
+                            C.Score++;
+                            break;
+                        } else if (arr[i][j + 2].c == ' ') {
+                            arr[i][j + 2].c = 186;
+                            arr[i][j + 2].color = 2;
+                            arr[i][j].c = 219;
+                            arr[i][j].color = 2;
+                            arr[i][j - 1].c = 219;
+                            arr[i][j - 1].color = 2;
+                            arr[i][j + 1].c = 219;
+                            arr[i][j + 1].color = 2;
+                            b++;
+                            z = 1;
+                            f = 1;
+                            C.Score++;
+                            break;
+                        }
+                    }
+                }
+                if (f == 1) break;
+            }
+            if (f == 1) {
+                system("cls");
+                z++;
+                PrintGrid(k , v ,arr);
+                continue;
+            }
+            if (arr[rc - 1][2*cc - 2].c == ' ') {
+                if (rc % 2 == 0 && cc % 2 == 1) {
+                    arr[rc - 1][2*cc - 2].c = 186;
+                    arr[rc - 1][2*cc - 2].color = 2;
+                    for (int i = 1; i < k; i += 2) {
+                        for (int j = 2; j < v; j += 4) {
+                            f = 0;
+                            if (arr[i][j].c == ' ') {
+                                if (arr[i][j - 2].c != ' ' && arr[i][j + 2].c != ' ' && arr[i - 1][j].c != ' ' &&
+                                    arr[i + 1][j].c != ' ') {
+                                    arr[i][j].c = 219;
+                                    arr[i][j].color = 2;
+                                    arr[i][j - 1].c = 219;
+                                    arr[i][j - 1].color = 2;
+                                    arr[i][j + 1].c = 219;
+                                    arr[i][j + 1].color = 2;
+                                    b++;
+                                    z = 1;
+                                    f = 1;
+                                    C.Score++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                } else if (rc % 2 == 1 && cc % 2 == 0) {
+                    arr[rc - 1][2*cc - 2].c = 205;
+                    arr[rc - 1][2*cc - 2].color = 2;
+                    arr[rc - 1][2*cc - 1].c = 205;
+                    arr[rc - 1][2*cc - 1].color = 2;
+                    arr[rc - 1][2*cc - 3].c = 205;
+                    arr[rc - 1][2*cc - 3].color = 2;
+                    for (int i = 1; i < k; i += 2) {
+                        for (int j = 2; j < v; j += 4) {
+                            f = 0;
+                            if (arr[i][j].c == ' ') {
+                                if (arr[i][j - 2].c != ' ' && arr[i][j + 2].c != ' ' && arr[i - 1][j].c != ' ' &&
+                                    arr[i + 1][j].c != ' ') {
+                                    arr[i][j].c = 219;
+                                    arr[i][j].color = 2;
+                                    arr[i][j - 1].c = 219;
+                                    arr[i][j - 1].color = 2;
+                                    arr[i][j + 1].c = 219;
+                                    arr[i][j + 1].color = 2;
+                                    b++;
+                                    z = 1;
+                                    f = 1;
+                                    C.Score++;
+                                    break;
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            if(f == 1){
+                system("cls");
+                z++;
+                PrintGrid(k , v ,arr);
+                continue;
+            }
 
+
+
+
+
+
+
+
+
+            while (1) {
+                f = 0;
+                srand(time(0));
+                int Rr = (rand() % (k - 1 - 0 + 1));
+                int Cr = (rand() % (v - 1 - 0 + 1));
+                if (arr[Rr - 1][2*Cr - 2].c == ' ') {
+                    if (Rr % 2 == 0 && Cr % 2 == 1) {
+                        arr[Rr - 1][2 * Cr - 2].c = 186;
+                        arr[Rr - 1][2 * Cr - 2].color = 2;
+                        f = 1;
+                        for (int i = 1; i < k; i += 2) {
+                            for (int j = 2; j < v; j += 4) {
+                                if (arr[i][j].c == ' ') {
+                                    if (arr[i][j - 2].c != ' ' && arr[i][j + 2].c != ' ' && arr[i - 1][j].c != ' ' &&
+                                        arr[i + 1][j].c != ' ') {
+                                        arr[i][j].c = 219;
+                                        arr[i][j].color = 2;
+                                        arr[i][j - 1].c = 219;
+                                        arr[i][j - 1].color = 2;
+                                        arr[i][j + 1].c = 219;
+                                        arr[i][j + 1].color = 2;
+                                        b++;
+                                        z = 1;
+                                        C.Score++;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    } else if (Rr % 2 == 1 && Cr % 2 == 0) {
+                        arr[Rr - 1][2 * Cr - 2].color = 2;
+                        arr[Rr - 1][2 * Cr - 2].c = 205;
+                        arr[Rr - 1][2 * Cr - 1].color = 2;
+                        arr[Rr - 1][2 * Cr - 1].c = 205;
+                        arr[Rr - 1][2 * Cr - 3].color = 2;
+                        arr[Rr - 1][2 * Cr - 3].c = 205;
+                        for (int i = 1; i < k; i += 2) {
+                            for (int j = 2; j < v; j += 4) {
+                                if (arr[i][j].c == ' ') {
+                                    if (arr[i][j - 2].c != ' ' && arr[i][j + 2].c != ' ' && arr[i - 1][j].c != ' ' &&
+                                        arr[i + 1][j].c != ' ') {
+                                        arr[i][j].c = 219;
+                                        arr[i][j].color = 2;
+                                        arr[i][j - 1].c = 219;
+                                        arr[i][j - 1].color = 2;
+                                        arr[i][j + 1].c = 219;
+                                        arr[i][j + 1].color = 2;
+                                        b++;
+                                        z = 1;
+                                        C.Score++;
+                                        break;
+                                    }
+                                }
+                            }
+                        }
+                        break;
+                    }
+                }
+            }
+            if(f == 1){
+                z++;
+                system("cls");
+                PrintGrid(k, v, arr);
+            }
+            if (b == n * n) {
+                printf("Game Ended");
+                break;
+            }
+        }
+    }
 }
-
 void SaveGame() {
     ///
 }
@@ -242,22 +588,149 @@ void LoadGame() {
     ///
 }
 
+int Undo(int* P1,int* P2,int* b,int x,int moves[2*x*(x+1)][3],int q,int k,int v,Element arr[k][v]){
+    int r , c , p , z;
+    *b = 0;
+    for (int i = 0; i < k; ++i) {
+        for (int j = 0; j < v; ++j) {
+            arr[i][j].color = 0;
+            arr[i][j].c = ' ';
+        }
+    }
+    for (int i = 0; i < k; i += 2) {
+        for (int j = 0; j < v; j += 4) {
+            arr[i][j].c = 254;
+        }
+    }
+    for(int u = 0;u < q - 1; u++) {
+        r = moves[u][0];
+        c = moves[u][1];
+        p = moves[u][2];
+        if (r % 2 == 0 && c % 2 == 1) {
+            arr[r - 1][2 * c - 2].c = 186;
+            arr[r - 1][2 * c - 2].color = p;
+        } else if (r % 2 == 1 && c % 2 == 0) {
+            arr[r - 1][2 * c - 2].color = p;
+            arr[r - 1][2 * c - 2].c = 205;
+            arr[r - 1][2 * c - 1].color = p;
+            arr[r - 1][2 * c - 1].c = 205;
+            arr[r - 1][2 * c - 3].color = p;
+            arr[r - 1][2 * c - 3].c = 205;
+        }
+        for (int i = 1; i < k; i += 2) {
+            for (int j = 2; j < v; j += 4) {
+                if (arr[i][j].c == ' ') {
+                    if (arr[i][j - 2].c != ' ' && arr[i][j + 2].c != ' ' && arr[i - 1][j].c != ' ' && arr[i + 1][j].c != ' ') {
+                        if (p == 1) {
+                            *b++;
+                            *P1++;
+                            arr[i][j].c = 219;
+                            arr[i][j].color = 1;
+                            arr[i][j - 1].c = 219;
+                            arr[i][j - 1].color = 1;
+                            arr[i][j + 1].c = 219;
+                            arr[i][j + 1].color = 1;
+                        } else {
+                            *b++;
+                            *P2++;
+                            arr[i][j].c = 219;
+                            arr[i][j].color = 2;
+                            arr[i][j - 1].c = 219;
+                            arr[i][j - 1].color = 2;
+                            arr[i][j + 1].c = 219;
+                            arr[i][j + 1].color = 2;
+                        }
+                    }
+                }
+            }
+        }
+    }
+    system("cls");
+    PrintGrid(k, v, arr);
+    return moves[q - 1][2];
+}
+
+int Redo(int* P1,int* P2,int* b,int x,int moves[2*x*(x+1)][3],int q,int k,int v,Element arr[k][v]){
+    int r , c , p, z = 1;
+    *b = 0;
+    for (int i = 0; i < k; ++i) {
+        for (int j = 0; j < v; ++j) {
+            arr[i][j].color = 0;
+            arr[i][j].c = ' ';
+        }
+    }
+    for (int i = 0; i < k; i += 2) {
+        for (int j = 0; j < v; j += 4) {
+            arr[i][j].c = 254;
+        }
+    }
+    for(int u = 0;u < q + 1; u++) {
+        r = moves[u][0];
+        c = moves[u][1];
+        p = moves[u][2];
+        if (r % 2 == 0 && c % 2 == 1) {
+            arr[r - 1][2 * c - 2].c = 186;
+            arr[r - 1][2 * c - 2].color = p;
+        } else if (r % 2 == 1 && c % 2 == 0) {
+            arr[r - 1][2 * c - 2].color = p;
+            arr[r - 1][2 * c - 2].c = 205;
+            arr[r - 1][2 * c - 1].color = p;
+            arr[r - 1][2 * c - 1].c = 205;
+            arr[r - 1][2 * c - 3].color = p;
+            arr[r - 1][2 * c - 3].c = 205;
+        }
+        for (int i = 1; i < k; i += 2) {
+            for (int j = 2; j < v; j += 4) {
+                if (arr[i][j].c == ' ') {
+                    if (arr[i][j - 2].c != ' ' && arr[i][j + 2].c != ' ' && arr[i - 1][j].c != ' ' && arr[i + 1][j].c != ' ') {
+                        if (p == 1) {
+                            *b++;
+                            *P1++;
+                            z = 2;
+                            arr[i][j].c = 219;
+                            arr[i][j].color = 1;
+                            arr[i][j - 1].c = 219;
+                            arr[i][j - 1].color = 1;
+                            arr[i][j + 1].c = 219;
+                            arr[i][j + 1].color = 1;
+                        } else {
+                            *b++;
+                            *P2++;
+                            z = 1;
+                            arr[i][j].c = 219;
+                            arr[i][j].color = 2;
+                            arr[i][j - 1].c = 219;
+                            arr[i][j - 1].color = 2;
+                            arr[i][j + 1].c = 219;
+                            arr[i][j + 1].color = 2;
+                        }
+                    }
+                }
+            }
+        }
+        z++;
+    }
+    system("cls");
+    PrintGrid(k, v, arr);
+    return z;
+}
+
 void Scores(int newScore,char newName[30]) {
     int swap,flag=0;
     char sswap[30];
     Player z[11];
-     for(int i=0;i<11;i++){
+    for(int i=0;i<11;i++){
         z[i].Score=0;
         z[i].Name[0]='\0';
-     }
-   FILE *f = fopen("scores.txt","r");
-   for(int i=0;i<11;i++){
+    }
+    FILE *f = fopen("scores.txt","r");
+    for(int i=0;i<11;i++){
         fscanf(f,"%[^\n]",z[i].Name);
         fscanf(f,"%d\n",&z[i].Score);
 
-     }
-     fclose(f);
-     for(int j=0;j<10;j++){
+    }
+    fclose(f);
+    for(int j=0;j<10;j++){
         if(!strcmp(z[j].Name,newName)){
             if(newScore>=z[j].Score){
                 z[j].Score=newScore;
@@ -265,41 +738,40 @@ void Scores(int newScore,char newName[30]) {
                 break;
             }
         }
-     }
-     if(flag==0){
-     strcpy(z[10].Name,newName);
-     z[10].Score=newScore;
-     }
-     for (int c = 0 ; c < 11 - 1; c++)
-  {
-    for (int d = 0 ; d < 11 - c - 1; d++)
-    {
-      if (z[d].Score < z[d+1].Score)
-      {
-        swap       = z[d].Score;
-        strcpy(sswap,z[d].Name);
-        z[d].Score   = z[d+1].Score;
-        strcpy(z[d].Name,z[d+1].Name);
-        z[d+1].Score = swap;
-        strcpy(z[d+1].Name,sswap);
-      }
     }
-  }
+    if(flag==0){
+        strcpy(z[10].Name,newName);
+        z[10].Score=newScore;
+    }
+    for (int c = 0 ; c < 11 - 1; c++)
+    {
+        for (int d = 0 ; d < 11 - c - 1; d++)
+        {
+            if (z[d].Score < z[d+1].Score)
+            {
+                swap = z[d].Score;
+                strcpy(sswap,z[d].Name);
+                z[d].Score = z[d+1].Score;
+                strcpy(z[d].Name,z[d+1].Name);
+                z[d+1].Score = swap;
+                strcpy(z[d+1].Name,sswap);
+            }
+        }
+    }
 
-     for(int i=0;i<10;i++){
+    for(int i=0;i<10;i++){
         if(z[i].Score!=0){
             printf("%d)%s  %d\n",i+1,z[i].Name,z[i].Score);
-           // fprintf(b,"%s\n%d\n",z[i].Name,z[i].Score);
         }
-     }
-     FILE *b =fopen("scores.txt","w");
-     for(int i=0;i<10;i++){
+    }
+    FILE *b =fopen("scores.txt","w");
+    for(int i=0;i<10;i++){
         if(z[i].Score!=0){
 
             fprintf(b,"%s\n%d\n",z[i].Name,z[i].Score);
         }
-     }
-     fclose(b);
+    }
+    fclose(b);
 
 }
 
@@ -308,7 +780,7 @@ void UI(){
 }
 
 void Time() {
-    ///
+
 }
 
 void GameMode(int z) {
@@ -368,13 +840,36 @@ void CharacterChecker(char x[]) {
 }
 
 void PrintGrid(int x, int y, Element arr[x][y]) {
-    printf(" \t \t \t \t \t   ");
-    for (int i = 0; i < y / 2 + 1; i++) {
-        printf("%d ", i + 1);
+    int D[y / 2 + 1] , C[y / 2 + 1];
+    printf("  \t \t \t \t \t    ");
+    for (int i = 0; i < y / 2 + 1; ++i) {
+        if(i + 1 > 9){
+            D[i] = (i + 1) / 10;
+            printf("%d " , D[i]);
+        }else{
+            D[i] = i + 1;
+            printf("%d ", D[i]);
+        }
+    }
+    if( ((y - 1)/2 + 1) > 9 ) {
+        printf("\n");
+        printf("  \t \t \t \t \t    ");
+        for (int i = 0; i < y / 2 + 1; ++i) {
+            if (i + 1 > 9) {
+                C[i] = (i + 1) % 10;
+                printf("%d ", C[i]);
+            } else {
+                printf("  ");
+            }
+        }
     }
     printf("\n");
     for (int i = 0; i < x; ++i) {
-        printf(" \t \t \t \t \t %d ", i + 1);
+        if(i >= 9){
+            printf(" \t \t \t \t \t %d ", i + 1);
+        }else {
+            printf(" \t \t \t \t \t %d  ", i + 1);
+        }
         for (int j = 0; j < y; ++j) {
             if (arr[i][j].color == 1) {
                 printf(RED"%c"RESET, arr[i][j].c);
