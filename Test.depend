@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1640463250 source:a:\csed\3rd semester\programming\codeblocks project\test\main.c
+	<stdio.h>
+	<stdlib.h>
+	<windows.h>
+	<conio.h>
+	<math.h>
+

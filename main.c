@@ -33,7 +33,8 @@ void GameMode(int n);
 
 void UI();
 
-void PlayerVSPlayer(int n,int k,int v,Element arr[k][v],int score1, int score2, int b, int z,int moves[2*n*(n+1)][3],int y);
+void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int score2, int b, int z,
+                    int moves[2 * n * (n + 1)][3], int y);
 
 void ComputerVSPlayer(int x);
 
@@ -113,10 +114,11 @@ void GameDifficulty() {
     }
 }
 
-void PlayerVSPlayer(int n,int k,int v,Element arr[k][v],int score1, int score2, int b, int z,int moves[2*n*(n+1)][3],int y){
+void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int score2, int b, int z,
+                    int moves[2 * n * (n + 1)][3], int y) {
     int r, c, p = 1, last, back = 0;
     last = y;
-    Player P1 ,P2;
+    Player P1, P2;
     P1.Score = score1;
     P2.Score = score2;
     PrintGrid(k, v, arr);
@@ -332,13 +334,11 @@ void ComputerVSPlayer(int n) {
             }
             continue;
         } else {
-            int rc = c, cc = r,i=0,j=0;
-
-            // ------------------------------------------------------------------------
+            int rc = c, cc = r, i = 0, j = 0;
 
 
-            for ( i = 1; i < k; i += 2) {
-                for ( j = 2; j < v; j += 4) {
+            for (i = 1; i < k; i += 2) {
+                for (j = 2; j < v; j += 4) {
                     h = 0;
                     f = 0;
                     if (arr[i][j].c == ' ') {
@@ -354,104 +354,102 @@ void ComputerVSPlayer(int n) {
                         if (arr[i][j + 2].c != ' ') {
                             h++;
                         }
-                        if(h==3){
-                            f=1;
+                        if (h == 3) {
+                            f = 1;
                             break;
 
                         }
                     }
                 }
-                if(f==1)
+                if (f == 1)
                     break;
             }
             if (h == 3) {
                 if (arr[i + 1][j].c == ' ') {
-                            arr[i + 1][j].c = 205;
-                            arr[i + 1][j].color = 2;
-                            arr[i + 1][j - 1].c = 205;
-                            arr[i + 1][j - 1].color = 2;
-                            arr[i + 1][j + 1].c = 205;
-                            arr[i + 1][j + 1].color = 2;
+                    arr[i + 1][j].c = 205;
+                    arr[i + 1][j].color = 2;
+                    arr[i + 1][j - 1].c = 205;
+                    arr[i + 1][j - 1].color = 2;
+                    arr[i + 1][j + 1].c = 205;
+                    arr[i + 1][j + 1].color = 2;
                 } else if (arr[i - 1][j].c == ' ') {
-                            arr[i - 1][j].c = 205;
-                            arr[i - 1][j].color = 2;
-                            arr[i - 1][j - 1].c = 205;
-                            arr[i - 1][j - 1].color = 2;
-                            arr[i - 1][j + 1].c = 205;
-                            arr[i - 1][j + 1].color = 2;
+                    arr[i - 1][j].c = 205;
+                    arr[i - 1][j].color = 2;
+                    arr[i - 1][j - 1].c = 205;
+                    arr[i - 1][j - 1].color = 2;
+                    arr[i - 1][j + 1].c = 205;
+                    arr[i - 1][j + 1].color = 2;
                 } else if (arr[i][j - 2].c == ' ') {
-                            arr[i][j - 2].c = 186;
-                            arr[i][j - 2].color = 2;
+                    arr[i][j - 2].c = 186;
+                    arr[i][j - 2].color = 2;
                 } else if (arr[i][j + 2].c == ' ') {
-                            arr[i][j + 2].c = 186;
-                            arr[i][j + 2].color = 2;
+                    arr[i][j + 2].c = 186;
+                    arr[i][j + 2].color = 2;
                 }
                 for (int a = 1; a < k; a += 2) {
                     for (int d = 2; d < v; d += 4) {
                         if (arr[a][d].c == ' ') {
-                            if (arr[a][d - 2].c != ' ' && arr[a][d + 2].c != ' ' && arr[a - 1][d].c != ' ' &&arr[a + 1][d].c != ' ') {
-                                        arr[a][d].c = 219;
-                                        arr[a][d].color = 2;
-                                        arr[a][d - 1].c = 219;
-                                        arr[a][d - 1].color = 2;
-                                        arr[a][d + 1].c = 219;
-                                        arr[a][d + 1].color = 2;
-                                        b++;
-                                        z = 1;
-                                        C.Score++;
-                                    }
-                                }
+                            if (arr[a][d - 2].c != ' ' && arr[a][d + 2].c != ' ' && arr[a - 1][d].c != ' ' &&
+                                arr[a + 1][d].c != ' ') {
+                                arr[a][d].c = 219;
+                                arr[a][d].color = 2;
+                                arr[a][d - 1].c = 219;
+                                arr[a][d - 1].color = 2;
+                                arr[a][d + 1].c = 219;
+                                arr[a][d + 1].color = 2;
+                                b++;
+                                z = 1;
+                                C.Score++;
                             }
                         }
+                    }
+                }
                 system("cls");
                 z++;
                 PrintGrid(k, v, arr);
                 continue;
 
-                }else if (arr[rc - 1][2 * cc - 2].c == ' ') {
+            } else if (arr[rc - 1][2 * cc - 2].c == ' ') {
 
-                    if (rc % 2 == 0 && cc % 2 == 1) {
+                if (rc % 2 == 0 && cc % 2 == 1) {
                     arr[rc - 1][2 * cc - 2].c = 186;
                     arr[rc - 1][2 * cc - 2].color = 2;
-                    }
-                    else if (rc % 2 == 1 && cc % 2 == 0) {
+                } else if (rc % 2 == 1 && cc % 2 == 0) {
                     arr[rc - 1][2 * cc - 2].c = 205;
                     arr[rc - 1][2 * cc - 2].color = 2;
                     arr[rc - 1][2 * cc - 1].c = 205;
                     arr[rc - 1][2 * cc - 1].color = 2;
                     arr[rc - 1][2 * cc - 3].c = 205;
                     arr[rc - 1][2 * cc - 3].color = 2;
-                    }
-                    system("cls");
-                    z++;
-                    PrintGrid(k, v, arr);
-                    continue;
                 }
-                else{
-                    srand(time(0));
-                    while (1) {
+                system("cls");
+                z++;
+                PrintGrid(k, v, arr);
+                continue;
+            } else {
+                srand(time(0));
+                while (1) {
                     f = 0;
 
 
-                    int Rr = (rand() % (k ))+1;
-                    int Cr = (rand() % (v ))+1;
+                    int Rr = (rand() % (k)) + 1;
+                    int Cr = (rand() % (v)) + 1;
 
                     if (Rr > k || 2 * Cr - 1 > v)
                         continue;
 
 
-
                     if (arr[Rr - 1][2 * Cr - 2].c != ' ')
                         continue;
 
-                     if (Rr % 2 == Cr % 2)
+                    if (Rr % 2 == Cr % 2)
                         continue;
 
 
                     if (Rr % 2 == 0 && Cr % 2 == 1) {
-                            arr[Rr - 1][2 * Cr - 2].c = 186;
-                            arr[Rr - 1][2 * Cr - 2].color = 2;
-                            f = 1;
+                        arr[Rr - 1][2 * Cr - 2].c = 186;
+                        arr[Rr - 1][2 * Cr - 2].color = 2;
+                        f = 1;
 
                     } else if (Rr % 2 == 1 && Cr % 2 == 0) {
                         arr[Rr - 1][2 * Cr - 2].color = 2;
@@ -460,27 +458,27 @@ void ComputerVSPlayer(int n) {
                         arr[Rr - 1][2 * Cr - 1].c = 205;
                         arr[Rr - 1][2 * Cr - 3].color = 2;
                         arr[Rr - 1][2 * Cr - 3].c = 205;
-                        f=1;
+                        f = 1;
 
                     }
                     if (f == 1) {
-                z++;
-                system("cls");
-                PrintGrid(k, v, arr);
-                break;
+                        z++;
+                        system("cls");
+                        PrintGrid(k, v, arr);
+                        break;
 
-               }else{
-                continue;
+                    } else {
+                        continue;
 
-            }
-             }
-              }
-               }
-           if (b == n * n) {
-                printf("Game Ended");
-                break;
+                    }
+                }
             }
         }
+        if (b == n * n) {
+            printf("Game Ended");
+            break;
+        }
+    }
 }
 
 void SaveGame(int n, int moves[2 * n * (n + 1)][3], int y) {
@@ -576,7 +574,7 @@ void LoadGame() {
         }
         z++;
     }
-    PlayerVSPlayer(n,k,v,arr1,score1,score2,b,z,moves,y);
+    PlayerVSPlayer(n, k, v, arr1, score1, score2, b, z, moves, y);
 }
 
 int Undo(int *P1, int *P2, int *b, int x, int moves[2 * x * (x + 1)][3], int q, int k, int v, Element arr[k][v]) {
@@ -780,16 +778,16 @@ void GameMode(int n) {
     printf(" \t \t \t \t \t Player vs Computer ---> enter (2) \n");
     printf(" \t \t \t \t \t Choose An Option = ");
     int x = InputHandling(s, 1, 2);
-    int moves[2*n*(n+1)][3];
-    Element arr1[2*n+1][4*n+1];
-    for (int i = 0; i < 2*n+1; ++i) {
-        for (int j = 0; j < 4*n+1; ++j) {
+    int moves[2 * n * (n + 1)][3];
+    Element arr1[2 * n + 1][4 * n + 1];
+    for (int i = 0; i < 2 * n + 1; ++i) {
+        for (int j = 0; j < 4 * n + 1; ++j) {
             arr1[i][j].color = 0;
             arr1[i][j].c = ' ';
         }
     }
-    for (int i = 0; i < 2*n+1; i += 2) {
-        for (int j = 0; j < 4*n+1; j += 4) {
+    for (int i = 0; i < 2 * n + 1; i += 2) {
+        for (int j = 0; j < 4 * n + 1; j += 4) {
             arr1[i][j].c = 254;
         }
     }
@@ -800,7 +798,7 @@ void GameMode(int n) {
     }
     switch (x) {
         case 1:
-            PlayerVSPlayer(n,2*n+1,4*n+1,arr1,0,0,0,1,moves,0);
+            PlayerVSPlayer(n, 2 * n + 1, 4 * n + 1, arr1, 0, 0, 0, 1, moves, 0);
             break;
         case 2:
             ComputerVSPlayer(n);
