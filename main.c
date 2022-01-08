@@ -332,13 +332,13 @@ void ComputerVSPlayer(int n) {
             }
             continue;
         } else {
-            int rc = c, cc = r;
+            int rc = c, cc = r,i=0,j=0;
 
             // ------------------------------------------------------------------------
 
 
-            for (int i = 1; i < k; i += 2) {
-                for (int j = 2; j < v; j += 4) {
+            for ( i = 1; i < k; i += 2) {
+                for ( j = 2; j < v; j += 4) {
                     h = 0;
                     f = 0;
                     if (arr[i][j].c == ' ') {
@@ -354,34 +354,42 @@ void ComputerVSPlayer(int n) {
                         if (arr[i][j + 2].c != ' ') {
                             h++;
                         }
+                        if(h==3){
+                            f=1;
+                            break;
+
+                        }
                     }
-                    if (h == 3) {
-                        if (arr[i + 1][j].c == ' ') {
+                }
+                if(f==1)
+                    break;
+            }
+            if (h == 3) {
+                if (arr[i + 1][j].c == ' ') {
                             arr[i + 1][j].c = 205;
                             arr[i + 1][j].color = 2;
                             arr[i + 1][j - 1].c = 205;
                             arr[i + 1][j - 1].color = 2;
                             arr[i + 1][j + 1].c = 205;
                             arr[i + 1][j + 1].color = 2;
-                        } else if (arr[i - 1][j].c == ' ') {
+                } else if (arr[i - 1][j].c == ' ') {
                             arr[i - 1][j].c = 205;
                             arr[i - 1][j].color = 2;
                             arr[i - 1][j - 1].c = 205;
                             arr[i - 1][j - 1].color = 2;
                             arr[i - 1][j + 1].c = 205;
                             arr[i - 1][j + 1].color = 2;
-                        } else if (arr[i][j - 2].c == ' ') {
+                } else if (arr[i][j - 2].c == ' ') {
                             arr[i][j - 2].c = 186;
                             arr[i][j - 2].color = 2;
-                        } else if (arr[i][j + 2].c == ' ') {
+                } else if (arr[i][j + 2].c == ' ') {
                             arr[i][j + 2].c = 186;
                             arr[i][j + 2].color = 2;
-                        }
-                        for (int a = 1; a < k; a += 2) {
-                            for (int d = 2; a < v; d += 4) {
-                                if (arr[a][d].c == ' ') {
-                                    if (arr[a][d - 2].c != ' ' && arr[a][d + 2].c != ' ' && arr[a - 1][d].c != ' ' &&
-                                        arr[a + 1][d].c != ' ') {
+                }
+                for (int a = 1; a < k; a += 2) {
+                    for (int d = 2; d < v; d += 4) {
+                        if (arr[a][d].c == ' ') {
+                            if (arr[a][d - 2].c != ' ' && arr[a][d + 2].c != ' ' && arr[a - 1][d].c != ' ' &&arr[a + 1][d].c != ' ') {
                                         arr[a][d].c = 219;
                                         arr[a][d].color = 2;
                                         arr[a][d - 1].c = 219;
@@ -395,70 +403,56 @@ void ComputerVSPlayer(int n) {
                                 }
                             }
                         }
-                        f = 1;
-                    }
-                }
-            }
-            if(f == 1){
                 system("cls");
                 z++;
                 PrintGrid(k, v, arr);
                 continue;
-            }
 
-            //-------------------------------------------------------------------------------------
+                }else if (arr[rc - 1][2 * cc - 2].c == ' ') {
 
-            /*if (arr[rc - 1][2 * cc - 2].c == ' ') {
-                if (rc % 2 == 0 && cc % 2 == 1) {
+                    if (rc % 2 == 0 && cc % 2 == 1) {
                     arr[rc - 1][2 * cc - 2].c = 186;
                     arr[rc - 1][2 * cc - 2].color = 2;
-                } else if (rc % 2 == 1 && cc % 2 == 0) {
+                    }
+                    else if (rc % 2 == 1 && cc % 2 == 0) {
                     arr[rc - 1][2 * cc - 2].c = 205;
                     arr[rc - 1][2 * cc - 2].color = 2;
                     arr[rc - 1][2 * cc - 1].c = 205;
                     arr[rc - 1][2 * cc - 1].color = 2;
                     arr[rc - 1][2 * cc - 3].c = 205;
                     arr[rc - 1][2 * cc - 3].color = 2;
+                    }
+                    system("cls");
+                    z++;
+                    PrintGrid(k, v, arr);
+                    continue;
                 }
-                system("cls");
-                z++;
-                PrintGrid(k, v, arr);
-                continue;
-            }*/
-            z++;
+                else{
+                    srand(time(0));
+                    while (1) {
+                    f = 0;
 
-            //-----------------------------------------------------------------------------
 
-            /*while (1) {
-                f = 0;
-                srand(time(0));
-                int Rr = (rand() % (k - 1 - 0 + 1));
-                int Cr = (rand() % (v - 1 - 0 + 1));
-                if (arr[Rr - 1][2 * Cr - 2].c == ' ') {
+                    int Rr = (rand() % (k ))+1;
+                    int Cr = (rand() % (v ))+1;
+
+                    if (Rr > k || 2 * Cr - 1 > v)
+                        continue;
+
+
+
+                    if (arr[Rr - 1][2 * Cr - 2].c != ' ')
+                        continue;
+
+                     if (Rr % 2 == Cr % 2)
+                        continue;
+
+
                     if (Rr % 2 == 0 && Cr % 2 == 1) {
-                        arr[Rr - 1][2 * Cr - 2].c = 186;
-                        arr[Rr - 1][2 * Cr - 2].color = 2;
-                        f = 1;
-                        for (int i = 1; i < k; i += 2) {
-                            for (int j = 2; j < v; j += 4) {
-                                if (arr[i][j].c == ' ') {
-                                    if (arr[i][j - 2].c != ' ' && arr[i][j + 2].c != ' ' && arr[i - 1][j].c != ' ' &&
-                                        arr[i + 1][j].c != ' ') {
-                                        arr[i][j].c = 219;
-                                        arr[i][j].color = 2;
-                                        arr[i][j - 1].c = 219;
-                                        arr[i][j - 1].color = 2;
-                                        arr[i][j + 1].c = 219;
-                                        arr[i][j + 1].color = 2;
-                                        b++;
-                                        z = 1;
-                                        C.Score++;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        break;
+                            arr[Rr - 1][2 * Cr - 2].c = 186;
+                            arr[Rr - 1][2 * Cr - 2].color = 2;
+                            f = 1;
+
                     } else if (Rr % 2 == 1 && Cr % 2 == 0) {
                         arr[Rr - 1][2 * Cr - 2].color = 2;
                         arr[Rr - 1][2 * Cr - 2].c = 205;
@@ -466,41 +460,27 @@ void ComputerVSPlayer(int n) {
                         arr[Rr - 1][2 * Cr - 1].c = 205;
                         arr[Rr - 1][2 * Cr - 3].color = 2;
                         arr[Rr - 1][2 * Cr - 3].c = 205;
-                        for (int i = 1; i < k; i += 2) {
-                            for (int j = 2; j < v; j += 4) {
-                                if (arr[i][j].c == ' ') {
-                                    if (arr[i][j - 2].c != ' ' && arr[i][j + 2].c != ' ' && arr[i - 1][j].c != ' ' &&
-                                        arr[i + 1][j].c != ' ') {
-                                        arr[i][j].c = 219;
-                                        arr[i][j].color = 2;
-                                        arr[i][j - 1].c = 219;
-                                        arr[i][j - 1].color = 2;
-                                        arr[i][j + 1].c = 219;
-                                        arr[i][j + 1].color = 2;
-                                        b++;
-                                        z = 1;
-                                        C.Score++;
-                                        break;
-                                    }
-                                }
-                            }
-                        }
-                        break;
+                        f=1;
+
                     }
-                }
-            }
-            if (f == 1) {
+                    if (f == 1) {
                 z++;
                 system("cls");
                 PrintGrid(k, v, arr);
-            }*/
-            if (b == n * n) {
+                break;
+
+               }else{
+                continue;
+
+            }
+             }
+              }
+               }
+           if (b == n * n) {
                 printf("Game Ended");
                 break;
             }
-            continue;
         }
-    }
 }
 
 void SaveGame(int n, int moves[2 * n * (n + 1)][3], int y) {
