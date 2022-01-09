@@ -121,6 +121,7 @@ void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int scor
     //Gameloop
 
     while (1) {
+
         if (z % 2 == 1) {
             p = 1;
         } else {
@@ -139,6 +140,11 @@ void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int scor
                 continue;
             } else {
                 z = Undo(&P1, &P2, &b, n, moves, last, k, v, arr, 1);
+                if (z % 2 == 1) {
+                 p = 1;
+                 } else {
+                p = 2;
+                }
                 back++;
                 last--;
                 system("cls");
@@ -149,6 +155,11 @@ void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int scor
         } else if (r == 2 && c == 2) {
             if (last < y) {
                 z = Redo(&P1, &P2, &b, n, moves, last, k, v, arr);
+                 if (z % 2 == 1) {
+                 p = 1;
+                 } else {
+                p = 2;
+                }
                 last++;
                 back--;
                 system("cls");
@@ -279,6 +290,11 @@ void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int scor
             }
         }
         z++;
+        if (z % 2 == 1) {
+            p = 1;
+        } else {
+            p = 2;
+        }
         system("cls");
         PrintGrid(k, v, arr);
         UI(P1, P2, p, n, y);
@@ -970,11 +986,8 @@ void Scores(int newScore, char newName[30]) {
             }
         }
     }
-    for (int i = 0; i < 10; i++) {
-        if (z[i].Score != 0) {
-            printf("%d)%s  %d\n", i + 1, z[i].Name, z[i].Score);
-        }
-    }
+
+
     FILE *b = fopen("scores.txt", "w");
     for (int i = 0; i < 10; i++) {
         if (z[i].Score != 0) {
