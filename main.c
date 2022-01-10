@@ -3,19 +3,19 @@
 #include <time.h>
 #include <string.h>
 #include <windows.h>
-//#include<pthread.h>
 
 //vertical 186 horizontal 205 Box 219
-struct times{
-    int hrs, mins ,secs;
+struct times {
+    int hrs, mins, secs;
 };
-struct times split_time(long long int total){
+
+struct times split_time(long long int total) {
     struct times a;
-    long long mini=total%86400;
-    a.hrs=mini/3600;
-    int r1=mini%3600;
-    a.mins=r1/60;
-    a.secs=r1%60;
+    long long mini = total % 86400;
+    a.hrs = mini / 3600;
+    int r1 = mini % 3600;
+    a.mins = r1 / 60;
+    a.secs = r1 % 60;
 
     return a;
 }
@@ -39,31 +39,27 @@ typedef struct {
 #define CYAN    "\x1b[36m"
 #define RESET   "\x1b[0m"
 
-char s[100];
 void MainMenu();
 void GameDifficulty();
 void GameMode(int n);
-void UI(Player P1, Player P2, int p, int x,int y);
-void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int score2, int b, int z,int moves[2 * n * (n + 1)][3], int y,int n1,int n2,char Pn1[30],char Pn2[30]);
+void UI(Player P1, Player P2, int p, int x, int y);
+void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int score2, int b, int z,
+                    int moves[2 * n * (n + 1)][3], int y, int n1, int n2, char Pn1[30], char Pn2[30]);
 void ComputerVSPlayer(int n, int k, int v, Element arr[k][v],
-                      int score1, int score2, int b, int z,int moves[2 * n * (n + 1)][3], int y,int n1,int n2, char Pn[30],char Cn[30]);
+                      int score1, int score2, int b, int z, int moves[2 * n * (n + 1)][3], int y, int n1, int n2,
+                      char Pn[30], char Cn[30]);
 int Redo(Player *P1, Player *P2, int *b, int x, int moves[2 * x * (x + 1)][3], int q, int k, int v, Element arr[k][v]);
-int Undo(Player *P1, Player *P2, int *b, int x, int moves[2 * x * (x + 1)][3], int q, int k, int v, Element arr[k][v],int mode);
-void SaveGame(int n, int moves[2 * n * (n + 1)][3], int y, int mode, int file,char Pn1[30] , char Pn2[30]);
+int Undo(Player *P1, Player *P2, int *b, int x, int moves[2 * x * (x + 1)][3], int q, int k, int v, Element arr[k][v],
+         int mode);
+void SaveGame(int n, int moves[2 * n * (n + 1)][3], int y, int mode, int file, char Pn1[30], char Pn2[30]);
 void LoadGame(int file);
 void Top10();
-void Scores(int newScore, char newName[30]);
-void Time();
+int Scores(int newScore, char newName[30]);
 int StringSize(char x[]);
-void SizeChecker(char x[]);
-void CharacterChecker(char x[]);
-int InputHandling(char x[], int z, int y);
+void SizeChecker(char x[],int z,int y,int u,int m);
+int InputHandling(char x[],int z,int y,int u,int m);
 void PrintGrid(int x, int y, Element arr[x][y]);
-void *counter(void *v){
-    int y=0;
-    printf("hello");
-    return NULL;
-}
+
 int main() {
     system("");
     MainMenu();
@@ -76,7 +72,8 @@ void MainMenu() {
     printf(" \t \t \t \t \t top 10 Players ---> enter (3) \n");
     printf(" \t \t \t \t \t Exit           ---> enter (4) \n");
     printf(" \t \t \t \t \t Choose An Option = ");
-    int x = InputHandling(s, 1, 4);
+    char s[100];
+    int x = InputHandling(s, 1, 4, 1,1);
     switch (x) {
         case 1 :
             system("cls");
@@ -86,34 +83,48 @@ void MainMenu() {
             system("cls");
             int file;
             printf("Choose Load File 1 , 2 , 3 : ");
-            scanf("%d" , &file);
+            scanf("%d", &file);
             LoadGame(file);
             break;
         case 3 :
             system("cls");
             Top10();
+            printf("\nEnter AnyButton To Go Back To The Main Menu ");
+            gets(s);
+            system("cls");
+            MainMenu();
             break;
         case 4 :
             exit(0);
         default:
             break;
     }
-    return NULL;
 }
 
 void GameDifficulty() {
     system("cls");
     printf(" \t \t \t \t \t Choose Difficulty : \n");
-    printf(" \t \t \t \t \t Beginner (2 x 2) ---> enter (1) \n");
-    printf(" \t \t \t \t \t Expert   (5 x 5)  ---> enter (2) \n");
+    printf(" \t \t \t \t \t Easy     (2 x 2)  ---> enter (1) \n");
+    printf(" \t \t \t \t \t Medium   (3 x 3)  ---> enter (2) \n");
+    printf(" \t \t \t \t \t Hard     (4 x 4)  ---> enter (3) \n");
+    printf(" \t \t \t \t \t Expert   (5 x 5)  ---> enter (4) \n");
     printf(" \t \t \t \t \t Choose An Option = ");
-    int x = InputHandling(s, 1, 2);
+    char s[100];
+    int x = InputHandling(s, 1, 4, 2,1);
     switch (x) {
         case 1 :
             system("cls");
             GameMode(2);
             break;
         case 2 :
+            system("cls");
+            GameMode(3);
+            break;
+        case 3:
+            system("cls");
+            GameMode(4);
+            break;
+        case 4:
             system("cls");
             GameMode(5);
             break;
@@ -123,8 +134,11 @@ void GameDifficulty() {
 }
 
 void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int score2, int b, int z,
-                    int moves[2 * n * (n + 1)][3], int y,int n1,int n2,char Pn1[30],char Pn2[30]) {
-    int r, c, p = 1, last, back = 0, file = 0;
+                    int moves[2 * n * (n + 1)][3], int y, int n1, int n2, char Pn1[30], char Pn2[30]) {
+    int r, c, p = 1, last, back = 0, file = 0,rank = 0;
+    FILE *Debug = fopen("Debug.txt" , "w");
+    fclose(Debug);
+    char Sr[100] , Sc[100];
     last = y;
     Player P1, P2;
     P1.Score = score1;
@@ -141,16 +155,15 @@ void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int scor
     //Gameloop
 
     while (1) {
-
         if (z % 2 == 1) {
             p = 1;
         } else {
             p = 2;
         }
         printf(MAGENTA"Enter Row ="RESET);
-        scanf("%d", &r);
+        r = InputHandling(Sr,1,k,0,2);
         printf(MAGENTA"Enter Col ="RESET);
-        scanf("%d", &c);
+        c = InputHandling(Sc,1,k,0,2);
         if (r == 1 && c == 1) {
             if (last == 0) {
                 system("cls");
@@ -158,14 +171,14 @@ void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int scor
                 clock_t end = clock();
                 int time_spent = (end - begin) / CLOCKS_PER_SEC;
                 PrintGrid(k, v, arr);
-            UI(P1, P2, p, n, time_spent);
+                UI(P1, P2, p, n, time_spent);
                 continue;
             } else {
                 z = Undo(&P1, &P2, &b, n, moves, last, k, v, arr, 1);
                 if (z % 2 == 1) {
-                 p = 1;
-                 } else {
-                p = 2;
+                    p = 1;
+                } else {
+                    p = 2;
                 }
                 back++;
                 last--;
@@ -179,32 +192,32 @@ void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int scor
         } else if (r == 2 && c == 2) {
             if (last < y) {
                 z = Redo(&P1, &P2, &b, n, moves, last, k, v, arr);
-                 if (z % 2 == 1) {
-                 p = 1;
-                 } else {
-                p = 2;
+                if (z % 2 == 1) {
+                    p = 1;
+                } else {
+                    p = 2;
                 }
                 last++;
                 back--;
                 system("cls");
                 clock_t end = clock();
-            int time_spent = (end - begin) / CLOCKS_PER_SEC;
-            PrintGrid(k, v, arr);
-            UI(P1, P2, p, n, time_spent);
+                int time_spent = (end - begin) / CLOCKS_PER_SEC;
+                PrintGrid(k, v, arr);
+                UI(P1, P2, p, n, time_spent);
                 continue;
             } else {
                 system("cls");
                 printf("No Available Moves \n");
                 clock_t end = clock();
-            int time_spent = (end - begin) / CLOCKS_PER_SEC;
-            PrintGrid(k, v, arr);
-            UI(P1, P2, p, n, time_spent);
+                int time_spent = (end - begin) / CLOCKS_PER_SEC;
+                PrintGrid(k, v, arr);
+                UI(P1, P2, p, n, time_spent);
                 continue;
             }
         } else if (r == 3 && c == 3) {
             printf("Choose Save file 1 , 2 , 3 : ");
-            scanf("%d" , &file);
-            SaveGame(n, moves, y, 1, file, Pn1 , Pn2);
+            scanf("%d", &file);
+            SaveGame(n, moves, y, 1, file, Pn1, Pn2);
             system("cls");
             printf("Game Saved\n");
             clock_t end = clock();
@@ -212,7 +225,6 @@ void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int scor
             PrintGrid(k, v, arr);
             UI(P1, P2, p, n, time_spent);
             continue;
-
         } else if (r == 4 && c == 4) {
             system("cls");
             MainMenu();
@@ -232,7 +244,7 @@ void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int scor
             clock_t end = clock();
             int time_spent = (end - begin) / CLOCKS_PER_SEC;
             PrintGrid(k, v, arr);
-            UI(P1, P2, p, n,time_spent );
+            UI(P1, P2, p, n, time_spent);
             continue;
         }
         if (r % 2 == 0 && c % 2 == 0) {
@@ -335,19 +347,32 @@ void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int scor
         }
         system("cls");
         clock_t end = clock();
-            int time_spent = (end - begin) / CLOCKS_PER_SEC;
-            PrintGrid(k, v, arr);
-            UI(P1, P2, p, n, time_spent);
+        int time_spent = (end - begin) / CLOCKS_PER_SEC;
+        PrintGrid(k, v, arr);
+        UI(P1, P2, p, n, time_spent);
         if (b == n * n) {
-            printf("\t \t \t \tGame Ended\n");
+            printf(CYAN"\t \t \t \t \tGame Ended\n"RESET);
             if (P1.Score > P2.Score) {
-                Scores(P1.Score,P1.Name);
-                printf("\t \t \t \tPlayer 1 Won");
+                rank = Scores(P1.Score, P1.Name);
+                printf(RED"\t \t \t \t \tPlayer 1 Won\n"RESET);
+                if(rank == 0){
+                    printf("Not Ranked\n");
+                }else{
+                    printf(RED"\t \t \t \t \tPlayer 1 Rank : %d\n"RESET, rank);
+                }
+                Top10();
             } else if (P2.Score > P1.Score) {
-                Scores(P2.Score,P2.Name);
-                printf("\t \t \t \tPlayer 2 Won");
+                rank = Scores(P2.Score, P2.Name);
+                printf(BLUE"\t \t \t \t \tPlayer 2 Won\n"RESET);
+                if(rank == 0){
+                    printf("Not Ranked\n");
+                }else{
+                    printf(BLUE"\t \t \t \t \tPlayer 2 Rank : %d\n"RESET, rank);
+                }
+                Top10();
             } else {
-                printf("\t \t \t \tTie");
+                printf("\t \t \t \t \tTie\n");
+                Top10();
             }
             break;
         }
@@ -355,15 +380,18 @@ void PlayerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int scor
 }
 
 void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int score2, int b, int z,
-                      int moves[2 * n * (n + 1)][3], int y,int n1,int n2,char Pn[30],char Cn[30]) {
-    int r, c, p = 1, h, f, last, back = 0;
+                      int moves[2 * n * (n + 1)][3], int y, int n1, int n2, char Pn[30], char Cn[30]) {
+    int r, c, p = 1, h, f, last, back = 0,file = 0,rank = 0;
+    FILE *Debug = fopen("Debug.txt" , "w");
+    fclose(Debug);
+    char Sr[100] , Sc[100];
     last = y;
     Player P, C;
     P.Score = score1;
     C.Score = score2;
     P.n = n1;
     C.n = n2;
-    strcpy(P.Name,Pn);
+    strcpy(P.Name, Pn);
     strcpy(C.Name, Cn);
     system("cls");
     clock_t begin = clock();
@@ -377,9 +405,9 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
         }
         if (p == 1) {
             printf(MAGENTA"Enter Row ="RESET);
-            scanf("%d", &r);
+            r = InputHandling(Sr,1,k,0,2);
             printf(MAGENTA"Enter Col ="RESET);
-            scanf("%d", &c);
+            c = InputHandling(Sc,1,k,0,2);
             if (r == 1 && c == 1) {
                 if (last == 0) {
                     system("cls");
@@ -396,10 +424,10 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
                         last--;
                         if (z % 2 == 1) {
                             system("cls");
-                    clock_t end = clock();
-                    int time_spent = (end - begin) / CLOCKS_PER_SEC;
-                    PrintGrid(k, v, arr);
-                    UI(P, C, p, n, time_spent);
+                            clock_t end = clock();
+                            int time_spent = (end - begin) / CLOCKS_PER_SEC;
+                            PrintGrid(k, v, arr);
+                            UI(P, C, p, n, time_spent);
                             break;
                         }
                     }
@@ -407,16 +435,16 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
                 }
             } else if (r == 2 && c == 2) {
                 if (last < y) {
-                    while(1) {
+                    while (1) {
                         z = Redo(&P, &C, &b, n, moves, last, k, v, arr);
                         last++;
                         back--;
-                        if(z % 2 == 1){
+                        if (z % 2 == 1) {
                             system("cls");
-                                                clock_t end = clock();
-                    int time_spent = (end - begin) / CLOCKS_PER_SEC;
-                    PrintGrid(k, v, arr);
-                    UI(P, C, p, n, time_spent);
+                            clock_t end = clock();
+                            int time_spent = (end - begin) / CLOCKS_PER_SEC;
+                            PrintGrid(k, v, arr);
+                            UI(P, C, p, n, time_spent);
                             break;
                         }
                     }
@@ -424,20 +452,22 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
                 } else {
                     system("cls");
                     printf("No Available Moves \n");
-                                        clock_t end = clock();
+                    clock_t end = clock();
                     int time_spent = (end - begin) / CLOCKS_PER_SEC;
                     PrintGrid(k, v, arr);
                     UI(P, C, p, n, time_spent);
                     continue;
                 }
             } else if (r == 3 && c == 3) {
-                SaveGame(n, moves, y, 2, 2,Pn,"Computer");
+                printf("Choose Save file 1 , 2 , 3 : ");
+                scanf("%d", &file);
+                SaveGame(n, moves, y ,2 ,file, Pn, "Computer");
                 system("cls");
                 printf("Game Saved\n");
-                                    clock_t end = clock();
-                    int time_spent = (end - begin) / CLOCKS_PER_SEC;
-                    PrintGrid(k, v, arr);
-                    UI(P, C, p, n, time_spent);
+                clock_t end = clock();
+                int time_spent = (end - begin) / CLOCKS_PER_SEC;
+                PrintGrid(k, v, arr);
+                UI(P, C, p, n, time_spent);
                 continue;
             } else if (r == 4 && c == 4) {
                 system("cls");
@@ -446,28 +476,28 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
             if (r > k || 2 * c - 1 > v) {
                 system("cls");
                 printf("No Available Moves \n");
-                                    clock_t end = clock();
-                    int time_spent = (end - begin) / CLOCKS_PER_SEC;
-                    PrintGrid(k, v, arr);
-                    UI(P, C, p, n, time_spent);
+                clock_t end = clock();
+                int time_spent = (end - begin) / CLOCKS_PER_SEC;
+                PrintGrid(k, v, arr);
+                UI(P, C, p, n, time_spent);
                 continue;
             }
             if (arr[r - 1][2 * c - 2].c != ' ') {
                 system("cls");
                 printf("No Available Moves \n");
-                                    clock_t end = clock();
-                    int time_spent = (end - begin) / CLOCKS_PER_SEC;
-                    PrintGrid(k, v, arr);
-                    UI(P, C, p, n, time_spent);
+                clock_t end = clock();
+                int time_spent = (end - begin) / CLOCKS_PER_SEC;
+                PrintGrid(k, v, arr);
+                UI(P, C, p, n, time_spent);
                 continue;
             }
             if (r % 2 == 0 && c % 2 == 0) {
                 system("cls");
                 printf("No Available Moves \n");
-                                    clock_t end = clock();
-                    int time_spent = (end - begin) / CLOCKS_PER_SEC;
-                    PrintGrid(k, v, arr);
-                    UI(P, C, p, n, time_spent);
+                clock_t end = clock();
+                int time_spent = (end - begin) / CLOCKS_PER_SEC;
+                PrintGrid(k, v, arr);
+                UI(P, C, p, n, time_spent);
                 continue;
             }
             if (r % 2 == 0 && c % 2 == 1) {
@@ -478,6 +508,7 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
                 moves[last][2] = 1;
                 y -= back;
                 y++;
+                P.n++;
                 last = y;
                 back = 0;
             } else if (r % 2 == 1 && c % 2 == 0) {
@@ -492,15 +523,16 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
                 moves[last][2] = 1;
                 y -= back;
                 y++;
+                P.n++;
                 last = y;
                 back = 0;
             } else {
                 system("cls");
                 printf("No Available Moves\n");
-                                    clock_t end = clock();
-                    int time_spent = (end - begin) / CLOCKS_PER_SEC;
-                    PrintGrid(k, v, arr);
-                    UI(P, C, p, n, time_spent);
+                clock_t end = clock();
+                int time_spent = (end - begin) / CLOCKS_PER_SEC;
+                PrintGrid(k, v, arr);
+                UI(P, C, p, n, time_spent);
                 continue;
             }
             for (int i = 1; i < k; i += 2) {
@@ -523,19 +555,27 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
             }
             z++;
             system("cls");
-                                clock_t end = clock();
-                    int time_spent = (end - begin) / CLOCKS_PER_SEC;
-                    PrintGrid(k, v, arr);
-                    UI(P, C, p, n, time_spent);
+            clock_t end = clock();
+            int time_spent = (end - begin) / CLOCKS_PER_SEC;
+            PrintGrid(k, v, arr);
+            UI(P, C, p, n, time_spent);
             if (b == n * n) {
-                printf("\t \t \t \tGame Ended\n");
+                printf(CYAN"\t \t \t \t \tGame Ended\n"RESET);
                 if (P.Score > C.Score) {
-                    Scores(P.Score,P.Name);
-                    printf("\t \t \t \tPlayer 1 Won");
+                    rank = Scores(P.Score, P.Name);
+                    printf(RED"\t \t \t \t \tPlayer Won\n"RESET);
+                    if(rank == 0){
+                        printf("Not Ranked\n");
+                    }else{
+                        printf(RED"\t \t \t \t \tPlayer Rank : %d\n"RESET, rank);
+                    }
+                    Top10();
                 } else if (C.Score > P.Score) {
-                    printf("\t \t \t \tComputer Won");
+                    printf(BLUE"\t \t \t \t \tComputer Won\n"RESET);
+                    Top10();
                 } else {
-                    printf("\t \t \t \tTie");
+                    printf("\t \t \t \t \tTie\n");
+                    Top10();
                 }
                 break;
             }
@@ -604,6 +644,7 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
                 }
                 y -= back;
                 y++;
+                C.n++;
                 last = y;
                 back = 0;
                 for (int a = 1; a < k; a += 2) {
@@ -626,10 +667,30 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
                 }
                 system("cls");
                 z++;
-                                    clock_t end = clock();
-                    int time_spent = (end - begin) / CLOCKS_PER_SEC;
-                    PrintGrid(k, v, arr);
-                    UI(P, C, p, n, time_spent);
+                clock_t end = clock();
+                int time_spent = (end - begin) / CLOCKS_PER_SEC;
+                PrintGrid(k, v, arr);
+                UI(P, C, p, n, time_spent);
+                if (b == n * n) {
+                    printf(CYAN"\t \t \t \t \tGame Ended\n"RESET);
+                    if (P.Score > C.Score) {
+                        rank = Scores(P.Score, P.Name);
+                        printf(RED"\t \t \t \t \tPlayer Won\n"RESET);
+                        if(rank == 0){
+                            printf("Not Ranked\n");
+                        }else{
+                            printf(RED"\t \t \t \t \tPlayer Rank : %d\n"RESET, rank);
+                        }
+                        Top10();
+                    } else if (C.Score > P.Score) {
+                        printf(BLUE"\t \t \t \t \tComputer Won\n"RESET);
+                        Top10();
+                    } else {
+                        printf("\t \t \t \t \tTie\n");
+                        Top10();
+                    }
+                    break;
+                }
                 continue;
             } else if (arr[rc - 1][2 * cc - 2].c == ' ') {
                 if (rc % 2 == 0 && cc % 2 == 1) {
@@ -648,14 +709,35 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
                 moves[last][2] = 2;
                 y -= back;
                 y++;
+                C.n++;
                 last = y;
                 back = 0;
                 system("cls");
                 z++;
-                                    clock_t end = clock();
-                    int time_spent = (end - begin) / CLOCKS_PER_SEC;
-                    PrintGrid(k, v, arr);
-                    UI(P, C, p, n, time_spent);
+                clock_t end = clock();
+                int time_spent = (end - begin) / CLOCKS_PER_SEC;
+                PrintGrid(k, v, arr);
+                UI(P, C, p, n, time_spent);
+                if (b == n * n) {
+                    printf(CYAN"\t \t \t \t \tGame Ended\n"RESET);
+                    if (P.Score > C.Score) {
+                        rank = Scores(P.Score, P.Name);
+                        printf(RED"\t \t \t \t \tPlayer Won\n"RESET);
+                        if(rank == 0){
+                            printf("Not Ranked\n");
+                        }else{
+                            printf(RED"\t \t \t \t \tPlayer Rank : %d\n"RESET, rank);
+                        }
+                        Top10();
+                    } else if (C.Score > P.Score) {
+                        printf(BLUE"\t \t \t \t \tComputer Won\n"RESET);
+                        Top10();
+                    } else {
+                        printf("\t \t \t \t \tTie\n");
+                        Top10();
+                    }
+                    break;
+                }
                 continue;
             } else {
                 srand(time(0));
@@ -688,14 +770,15 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
                         moves[last][2] = 2;
                         y -= back;
                         y++;
+                        C.n++;
                         last = y;
                         back = 0;
                         z++;
                         system("cls");
-                                            clock_t end = clock();
-                    int time_spent = (end - begin) / CLOCKS_PER_SEC;
-                    PrintGrid(k, v, arr);
-                    UI(P, C, p, n, time_spent);
+                        clock_t end = clock();
+                        int time_spent = (end - begin) / CLOCKS_PER_SEC;
+                        PrintGrid(k, v, arr);
+                        UI(P, C, p, n, time_spent);
                         break;
                     } else {
                         continue;
@@ -704,30 +787,47 @@ void ComputerVSPlayer(int n, int k, int v, Element arr[k][v], int score1, int sc
             }
         }
         if (b == n * n) {
-            printf("\t \t \t \tGame Ended\n");
+            printf(CYAN"\t \t \t \t \tGame Ended\n"RESET);
             if (P.Score > C.Score) {
-                Scores(P.Score,P.Name);
-                printf("\t \t \t \tPlayer Won");
+                rank = Scores(P.Score, P.Name);
+                printf(RED"\t \t \t \t \tPlayer Won\n"RESET);
+                if(rank == 0){
+                    printf("Not Ranked\n");
+                }else{
+                    printf(RED"\t \t \t \t \tPlayer Rank : %d\n"RESET, rank);
+                }
+                Top10();
             } else if (C.Score > P.Score) {
-                printf("\t \t \t \tComputer Won");
+                printf(BLUE"\t \t \t \t \tComputer Won\n"RESET);
+                Top10();
             } else {
-                printf("\t \t \t \tTie");
+                printf("\t \t \t \t \tTie\n");
+                Top10();
             }
             break;
         }
+        continue;
     }
 }
 
-void SaveGame(int n, int moves[2 * n * (n + 1)][3], int y,int mode, int file, char Pn1[30] , char Pn2[30]) {
+void SaveGame(int n, int moves[2 * n * (n + 1)][3], int y, int mode, int file, char Pn1[30], char Pn2[30]) {
     FILE *s1;
     switch (file) {
-        case 1: s1 = fopen("gameone.txt", "w");break;
-        case 2: s1 = fopen("gametwo.txt", "w");break;
-        case 3: s1 = fopen("gamethree.txt", "w");break;
-        default: break;
+        case 1:
+            s1 = fopen("gameone.txt", "w");
+            break;
+        case 2:
+            s1 = fopen("gametwo.txt", "w");
+            break;
+        case 3:
+            s1 = fopen("gamethree.txt", "w");
+            break;
+        default:
+            break;
     }
-    fprintf(s1,"%s\n" , Pn1);
-    fprintf(s1,"%s\n" , Pn2);
+    fprintf(s1,"%d\n" , 1);
+    fprintf(s1, "%s\n", Pn1);
+    fprintf(s1, "%s\n", Pn2);
     fprintf(s1, "%d\n", mode);
     fprintf(s1, "%d\n", n);
     fprintf(s1, "%d\n", y);
@@ -741,109 +841,124 @@ void SaveGame(int n, int moves[2 * n * (n + 1)][3], int y,int mode, int file, ch
 }
 
 void LoadGame(int file) {
-    int b = 0, score1 = 0, score2 = 0, r, c, p, z = 1, n1 = 0 , n2 = 0;
-    char Pn1[30] ,Pn2[30];
+    int b = 0, score1 = 0, score2 = 0, r, c, p, z = 1, n1 = 0, n2 = 0, check = 0, x;
+    char Pn1[30], Pn2[30], X[30];
     FILE *L1;
     switch (file) {
-        case 1: L1 = fopen("gameone.txt", "r");break;
-        case 2: L1 = fopen("gametwo.txt", "r");break;
-        case 3: L1 = fopen("gamethree.txt", "r");break;
-        default: break;
+        case 1:
+            L1 = fopen("gameone.txt", "r");
+            break;
+        case 2:
+            L1 = fopen("gametwo.txt", "r");
+            break;
+        case 3:
+            L1 = fopen("gamethree.txt", "r");
+            break;
+        default:
+            break;
     }
     int y, n, mode;
-    fscanf(L1,"%s\n", Pn1);
+    fscanf(L1,"%d\n", &check);
+    fscanf(L1, "%s\n", Pn1);
     fscanf(L1, "%s\n", Pn2);
-    fscanf(L1,"%d\n", &mode);
+    fscanf(L1, "%d\n", &mode);
     fscanf(L1, "%d\n", &n);
     fscanf(L1, "%d\n", &y);
     int k = 2 * n + 1;
     int v = 4 * n + 1;
     Element arr1[k][v];
     int moves[2 * n * (n + 1)][3];
-    for (int i = 0; i < 2 * n * (n + 1); ++i) {
-        for (int j = 0; j < 3; ++j) {
-            moves[i][j] = 0;
-        }
-    }
-    for (int i = 0; i < y; i++) {
-        for (int j = 0; j < 3; j++) {
-            fscanf(L1, "%d%*c", &moves[i][j]);
-        }
-        fscanf(L1, "%*c");
-    }
-    fclose(L1);
-    for (int i = 0; i < k; ++i) {
-        for (int j = 0; j < v; ++j) {
-            arr1[i][j].color = 0;
-            arr1[i][j].c = ' ';
-        }
-    }
-    for (int i = 0; i < k; i += 2) {
-        for (int j = 0; j < v; j += 4) {
-            arr1[i][j].c = 254;
-        }
-    }
-    for (int u = 0; u < y; u++) {
-        r = moves[u][0];
-        c = moves[u][1];
-        p = moves[u][2];
-        if (r % 2 == 0 && c % 2 == 1) {
-            arr1[r - 1][2 * c - 2].c = 186;
-            arr1[r - 1][2 * c - 2].color = p;
-            if (p == 1) {
-                n1++;
-            } else {
-                n2++;
-            }
-        } else if (r % 2 == 1 && c % 2 == 0) {
-            arr1[r - 1][2 * c - 2].color = p;
-            arr1[r - 1][2 * c - 2].c = 205;
-            arr1[r - 1][2 * c - 1].color = p;
-            arr1[r - 1][2 * c - 1].c = 205;
-            arr1[r - 1][2 * c - 3].color = p;
-            arr1[r - 1][2 * c - 3].c = 205;
-            if (p == 1) {
-                n1++;
-            } else {
-                n2++;
+    if (check == 1) {
+        for (int i = 0; i < 2 * n * (n + 1); ++i) {
+            for (int j = 0; j < 3; ++j) {
+                moves[i][j] = 0;
             }
         }
-        for (int i = 1; i < k; i += 2) {
-            for (int j = 2; j < v; j += 4) {
-                if (arr1[i][j].c == ' ') {
-                    if (arr1[i][j - 2].c != ' ' && arr1[i][j + 2].c != ' ' && arr1[i - 1][j].c != ' ' &&
-                        arr1[i + 1][j].c != ' ') {
-                        if (p == 1) {
-                            b++;
-                            score1++;
-                            z = 2;
-                            arr1[i][j].c = 219;
-                            arr1[i][j].color = 1;
-                            arr1[i][j - 1].c = 219;
-                            arr1[i][j - 1].color = 1;
-                            arr1[i][j + 1].c = 219;
-                            arr1[i][j + 1].color = 1;
-                        } else {
-                            b++;
-                            score2++;
-                            z = 1;
-                            arr1[i][j].c = 219;
-                            arr1[i][j].color = 2;
-                            arr1[i][j - 1].c = 219;
-                            arr1[i][j - 1].color = 2;
-                            arr1[i][j + 1].c = 219;
-                            arr1[i][j + 1].color = 2;
+        for (int i = 0; i < y; i++) {
+            for (int j = 0; j < 3; j++) {
+                fscanf(L1, "%d%*c", &moves[i][j]);
+            }
+            fscanf(L1, "%*c");
+        }
+        fclose(L1);
+        for (int i = 0; i < k; ++i) {
+            for (int j = 0; j < v; ++j) {
+                arr1[i][j].color = 0;
+                arr1[i][j].c = ' ';
+            }
+        }
+        for (int i = 0; i < k; i += 2) {
+            for (int j = 0; j < v; j += 4) {
+                arr1[i][j].c = 254;
+            }
+        }
+        for (int u = 0; u < y; u++) {
+            r = moves[u][0];
+            c = moves[u][1];
+            p = moves[u][2];
+            if (r % 2 == 0 && c % 2 == 1) {
+                arr1[r - 1][2 * c - 2].c = 186;
+                arr1[r - 1][2 * c - 2].color = p;
+                if (p == 1) {
+                    n1++;
+                } else {
+                    n2++;
+                }
+            } else if (r % 2 == 1 && c % 2 == 0) {
+                arr1[r - 1][2 * c - 2].color = p;
+                arr1[r - 1][2 * c - 2].c = 205;
+                arr1[r - 1][2 * c - 1].color = p;
+                arr1[r - 1][2 * c - 1].c = 205;
+                arr1[r - 1][2 * c - 3].color = p;
+                arr1[r - 1][2 * c - 3].c = 205;
+                if (p == 1) {
+                    n1++;
+                } else {
+                    n2++;
+                }
+            }
+            for (int i = 1; i < k; i += 2) {
+                for (int j = 2; j < v; j += 4) {
+                    if (arr1[i][j].c == ' ') {
+                        if (arr1[i][j - 2].c != ' ' && arr1[i][j + 2].c != ' ' && arr1[i - 1][j].c != ' ' &&
+                            arr1[i + 1][j].c != ' ') {
+                            if (p == 1) {
+                                b++;
+                                score1++;
+                                z = 2;
+                                arr1[i][j].c = 219;
+                                arr1[i][j].color = 1;
+                                arr1[i][j - 1].c = 219;
+                                arr1[i][j - 1].color = 1;
+                                arr1[i][j + 1].c = 219;
+                                arr1[i][j + 1].color = 1;
+                            } else {
+                                b++;
+                                score2++;
+                                z = 1;
+                                arr1[i][j].c = 219;
+                                arr1[i][j].color = 2;
+                                arr1[i][j - 1].c = 219;
+                                arr1[i][j - 1].color = 2;
+                                arr1[i][j + 1].c = 219;
+                                arr1[i][j + 1].color = 2;
+                            }
                         }
                     }
                 }
             }
+            z++;
         }
-        z++;
-    }
-    if (mode == 1){
-        PlayerVSPlayer(n, k, v, arr1, score1, score2, b, z, moves, y, n1 , n2, Pn1, Pn2);
-    }else{
-        ComputerVSPlayer(n, k, v, arr1, score1, score2, b, z, moves, y, n1 , n2,Pn1, Pn2);
+        if (mode == 1) {
+            PlayerVSPlayer(n, k, v, arr1, score1, score2, b, z, moves, y, n1, n2, Pn1, Pn2);
+        } else {
+            ComputerVSPlayer(n, k, v, arr1, score1, score2, b, z, moves, y, n1, n2, Pn1, Pn2);
+        }
+    }else {
+        system("cls");
+        printf("Save File Is Empty \n");
+        getchar();
+        MainMenu();
     }
 }
 
@@ -861,7 +976,6 @@ int Undo(Player *P1, Player *P2, int *b, int x, int moves[2 * x * (x + 1)][3], i
             arr[i][j].c = ' ';
         }
     }
-
     for (int i = 0; i < k; i += 2) {
         for (int j = 0; j < v; j += 4) {
             arr[i][j].c = 254;
@@ -1002,8 +1116,8 @@ int Redo(Player *P1, Player *P2, int *b, int x, int moves[2 * x * (x + 1)][3], i
     return z;
 }
 
-void Scores(int newScore, char newName[30]) {
-    int swap, flag = 0;
+int Scores(int newScore, char newName[30]) {
+    int swap, flag = 0, rank = 0 ,compare = 0;
     char sswap[30];
     Player z[11];
     for (int i = 0; i < 11; i++) {
@@ -1051,11 +1165,22 @@ void Scores(int newScore, char newName[30]) {
             fprintf(b, "%s\n%d\n", z[i].Name, z[i].Score);
         }
     }
+    for (int i = 0; i < 10; ++i) {
+        if(strcmp(z[i].Name,newName) == 0){
+            rank = i + 1;
+            compare = 1;
+            break;
+        }
+    }
     fclose(b);
-
+    if (compare == 0){
+        return 0;
+    }else{
+        return rank;
+    }
 }
 
-void Top10(){
+void Top10() {
     int swap, flag = 0;
     char sswap[30];
     Player z[11];
@@ -1068,19 +1193,20 @@ void Top10(){
         fscanf(f, "%[^\n]", z[i].Name);
         fscanf(f, "%d\n", &z[i].Score);
     }
+    printf("\t \t \t \t \tTop 10 Players\n");
     for (int i = 0; i < 10; i++) {
         if (z[i].Score != 0) {
-            printf("%d)%s  %d\n", i + 1, z[i].Name, z[i].Score);
+            printf("\t \t \t \t \t%d)%s  %d\n", i + 1, z[i].Name, z[i].Score);
         }
     }
     fclose(f);
 }
 
-void UI(Player P1, Player P2, int p, int x,int y) {
+void UI(Player P1, Player P2, int p, int x, int y) {
     int compare = strcmp(P2.Name, "Computer");
     char s1[30], s2[30];
     struct times b;
-    b=split_time(y);
+    b = split_time(y);
     if (compare == 0) {
         strcpy(s1, "Player");
         strcpy(s2, "Computer");
@@ -1096,7 +1222,7 @@ void UI(Player P1, Player P2, int p, int x,int y) {
     printf(RED"%s Score : %d"RESET, s1, P1.Score);
     printf(BLUE"\t \t \t \t \t \t \t%s Score : %d\n"RESET, s2, P2.Score);
     printf(GREEN"Number of Remaining Moves : %d"RESET, 2 * x * (x + 1) - P1.n - P2.n);
-    printf(YELLOW"\t \t \t \t \t \tTime Passed : %d : %d : %d"RESET,b.hrs,b.mins,b.secs);
+    printf(YELLOW"\t \t \t \t \t \tTime Passed : %d : %d : %d"RESET, b.hrs, b.mins, b.secs);
 
     printf("\n");
     printf("\t Undo Enter 1 , 1\t \t \t \t \t Redo     Enter 2 , 2\n"
@@ -1107,15 +1233,10 @@ void UI(Player P1, Player P2, int p, int x,int y) {
     } else {
         if (p == 1) {
             printf(RED"\t \t \t \t \tPLAYER 1 Turn\n"RESET);
-        } else if(p == 2) {
+        } else if (p == 2) {
             printf(BLUE"\t \t \t \t \tPLAYER 2 Turn\n"RESET);
         }
     }
-}
-
-
-void Time() {
-    ///
 }
 
 void GameMode(int n) {
@@ -1124,9 +1245,10 @@ void GameMode(int n) {
     printf(" \t \t \t \t \t Player vs Player   ---> enter (1) \n");
     printf(" \t \t \t \t \t Player vs Computer ---> enter (2) \n");
     printf(" \t \t \t \t \t Choose An Option = ");
-    int x = InputHandling(s, 1, 2);
+    char s[100];
+    int x = InputHandling(s, 1, 2,3,1);
     int moves[2 * n * (n + 1)][3];
-    Player P1 ,P2;
+    Player P1, P2;
     Element arr1[2 * n + 1][4 * n + 1];
     for (int i = 0; i < 2 * n + 1; ++i) {
         for (int j = 0; j < 4 * n + 1; ++j) {
@@ -1154,95 +1276,171 @@ void GameMode(int n) {
             gets(P2.Name);
             system("cls");
             PlayerVSPlayer(n, 2 * n + 1, 4 * n + 1, arr1, 0, 0, 0, 1, moves, 0, 0, 0, P1.Name, P2.Name);
+            printf("\nEnter AnyButton To Go Back To The Main Menu ");
+            gets(s);
+            MainMenu();
             break;
         case 2:
             system("cls");
             printf(RED"Enter Player Name : "RESET);
             gets(P1.Name);
-            ComputerVSPlayer(n, 2 * n + 1, 4 * n + 1, arr1, 0, 0, 0, 1, moves, 0,0,0,P1.Name,"Computer");
+            ComputerVSPlayer(n, 2 * n + 1, 4 * n + 1, arr1, 0, 0, 0, 1, moves, 0, 0, 0, P1.Name, "Computer");
+            printf("\nEnter AnyButton To Go Back To The Main Menu ");
+            gets(s);
+            system("cls");
+            MainMenu();
             break;
         default:
             break;
     }
 }
 
-int InputHandling(char x[], int z, int y) {
-    SizeChecker(x);
-    CharacterChecker(x);
-    while (!(x[0] >= z + 48 && x[0] <= y + 48)) {
-        printf("Error,Enter A Number Btw %d And %d = \n", z, y);
-        SizeChecker(x);
-        CharacterChecker(x);
+int InputHandling(char x[], int z, int y,int u,int m) {
+    int v;
+    SizeChecker(x,z,y,u,m);
+    sscanf(x,"%d" , &v);
+    if (m == 1) {
+        while (!(v >= z && v <= y)) {
+            if (u == 1) {
+                system("cls");
+                printf(" \t \t \t \t \t Start Game     ---> enter (1) \n");
+                printf(" \t \t \t \t \t Load Game      ---> enter (2) \n");
+                printf(" \t \t \t \t \t top 10 Players ---> enter (3) \n");
+                printf(" \t \t \t \t \t Exit           ---> enter (4) \n");
+                printf("Error,Enter A Number Btw %d And %d = ", z, y);
+            } else if (u == 2) {
+                system("cls");
+                printf(" \t \t \t \t \t Choose Difficulty : \n");
+                printf(" \t \t \t \t \t Easy     (2 x 2)  ---> enter (1) \n");
+                printf(" \t \t \t \t \t Medium   (3 x 3)  ---> enter (2) \n");
+                printf(" \t \t \t \t \t Hard     (4 x 4)  ---> enter (3) \n");
+                printf(" \t \t \t \t \t Expert   (5 x 5)  ---> enter (4) \n");
+                printf("Error,Enter A Number Btw %d And %d = ", z, y);
+            } else if (u == 3) {
+                system("cls");
+                printf(" \t \t \t \t \t Choose GameMode : \n");
+                printf(" \t \t \t \t \t Player vs Player   ---> enter (1) \n");
+                printf(" \t \t \t \t \t Player vs Computer ---> enter (2) \n");
+                printf("Error,Enter A Number Btw %d And %d = ", z, y);
+            }
+            SizeChecker(x, z, y, u, m);
+            sscanf(x,"%d" , &v);
+        }
+    }else if (m == 2){
+        while(!(v >= z && v <= y)){
+            v = 0;
+            printf("Error,Enter A Number Btw %d And %d = ", z, y);
+            SizeChecker(x,z,y,u,m);
+            sscanf(x,"%d" , &v);
+        }
     }
-    return x[0] - 48;
+    return v;
 }
 
 int StringSize(char x[]) {
     int c = 0;
-    for (int i = 0; x[i] != '\0'; ++i) {
-        c++;
-    }
+    for (int i = 0; x[i] != '\0'; ++i) c++;
     return c;
 }
 
-void SizeChecker(char x[]) {
+void SizeChecker(char x[],int z,int y,int u,int m) {
     int c = 0;
-    while (c != 1) {
-        gets(x);
-        c = StringSize(x);
-        if (c != 1) {
-            printf("Error,Enter A Valid Number = \n");
+    if (m == 1) {
+        while (c != 1) {
+            gets(x);
+            c = StringSize(x);
+            if (c != 1) {
+                if (u == 1) {
+                    system("cls");
+                    printf(" \t \t \t \t \t Start Game     ---> enter (1) \n");
+                    printf(" \t \t \t \t \t Load Game      ---> enter (2) \n");
+                    printf(" \t \t \t \t \t top 10 Players ---> enter (3) \n");
+                    printf(" \t \t \t \t \t Exit           ---> enter (4) \n");
+                    printf("Error,Enter A Number Btw %d And %d = ", z, y);
+                } else if (u == 2) {
+                    system("cls");
+                    printf(" \t \t \t \t \t Choose Difficulty : \n");
+                    printf(" \t \t \t \t \t Easy     (2 x 2)  ---> enter (1) \n");
+                    printf(" \t \t \t \t \t Medium   (3 x 3)  ---> enter (2) \n");
+                    printf(" \t \t \t \t \t Hard     (4 x 4)  ---> enter (3) \n");
+                    printf(" \t \t \t \t \t Expert   (5 x 5)  ---> enter (4) \n");
+                    printf("Error,Enter A Number Btw %d And %d = ", z, y);
+                } else if (u == 3) {
+                    system("cls");
+                    printf(" \t \t \t \t \t Choose GameMode : \n");
+                    printf(" \t \t \t \t \t Player vs Player   ---> enter (1) \n");
+                    printf(" \t \t \t \t \t Player vs Computer ---> enter (2) \n");
+                    printf("Error,Enter A Number Btw %d And %d = ", z, y);
+                }
+            }
         }
-    }
-}
-
-void CharacterChecker(char x[]) {
-    while (!(x[0] >= 48 && x[0] <= 57)) {
-        printf("Error,Enter A Valid Number = \n");
-        SizeChecker(x);
+    }else if(m == 2){
+        while(c > 2 || c == 0){
+            gets(x);
+            c = StringSize(x);
+            if (c > 2){
+                printf("Error,Enter A Number Btw %d And %d = ", z , y);
+            }
+        }
     }
 }
 
 void PrintGrid(int x, int y, Element arr[x][y]) {
+    FILE *Debug = fopen("Debug.txt" , "a");
     int D[y / 2 + 1], C[y / 2 + 1];
     printf("  \t \t \t \t \t    ");
+    fprintf(Debug,"  \t \t \t \t \t    ");
     for (int i = 0; i < y / 2 + 1; ++i) {
         if (i + 1 > 9) {
             D[i] = (i + 1) / 10;
             printf("%d ", D[i]);
+            fprintf(Debug , "%d ", D[i]);
         } else {
             D[i] = i + 1;
             printf("%d ", D[i]);
+            fprintf(Debug , "%d ", D[i]);
         }
     }
     if (((y - 1) / 2 + 1) > 9) {
         printf("\n");
+        fprintf(Debug,"\n");
         printf("  \t \t \t \t \t    ");
+        fprintf(Debug,"  \t \t \t \t \t    ");
         for (int i = 0; i < y / 2 + 1; ++i) {
             if (i + 1 > 9) {
                 C[i] = (i + 1) % 10;
                 printf("%d ", C[i]);
+                fprintf(Debug , "%d ", C[i]);
             } else {
                 printf("  ");
+                fprintf(Debug , "  ");
             }
         }
     }
     printf("\n");
+    fprintf(Debug,"\n");
     for (int i = 0; i < x; ++i) {
         if (i >= 9) {
             printf(" \t \t \t \t \t %d ", i + 1);
+            fprintf(Debug," \t \t \t \t \t %d ", i + 1);
         } else {
             printf(" \t \t \t \t \t %d  ", i + 1);
+            fprintf(Debug," \t \t \t \t \t %d  ", i + 1);
         }
         for (int j = 0; j < y; ++j) {
             if (arr[i][j].color == 1) {
                 printf(RED"%c"RESET, arr[i][j].c);
+                fprintf(Debug,"%c", arr[i][j].c);
             } else if (arr[i][j].color == 2) {
                 printf(BLUE"%c"RESET, arr[i][j].c);
+                fprintf(Debug,"%c", arr[i][j].c);
             } else {
                 printf("%c", arr[i][j].c);
+                fprintf(Debug,"%c", arr[i][j].c);
             }
         }
         printf("\n");
+        fprintf(Debug,"\n");
     }
+    fclose(Debug);
 }
